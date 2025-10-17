@@ -1,8 +1,31 @@
-# Welcome to your Expo app 👋
+# NML E-Commerce App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern, well-structured React Native e-commerce application built with Expo, following best practices for component separation and clean code architecture.
 
-## Get started
+## Features
+
+- ✅ Modern UI with Arabic (RTL) support
+- ✅ Clean component architecture
+- ✅ TypeScript for type safety
+- ✅ Reusable UI components
+- ✅ File-based routing with Expo Router
+- ✅ Consistent design system (colors, typography, spacing)
+- ✅ Ready for e-commerce integration
+
+## Project Structure
+
+See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for detailed information about the project architecture.
+
+```
+app/              # Screens and navigation
+components/       # Reusable UI components
+constants/        # Design tokens and constants
+types/            # TypeScript type definitions
+utils/            # Helper functions
+assets/           # Images and static files
+```
+
+## Get Started
 
 1. Install dependencies
 
@@ -13,8 +36,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 2. Start the app
 
    ```bash
+   npm start
+   # or
    npx expo start
    ```
+
+3. Open the app on your device
+
+   - Press `i` for iOS simulator
+   - Press `a` for Android emulator
+   - Scan QR code with Expo Go app on your phone
 
 In the output, you'll find options to open the app in a
 
@@ -25,15 +56,62 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## Current Screens
 
-When you're ready, run:
+- **Welcome Screen** (`/welcome`) - Onboarding screen with app introduction
+- **Login Screen** (`/auth/login`) - User authentication
+- **Home Screen** (`/home`) - Main app screen (placeholder)
 
-```bash
-npm run reset-project
+## Available Scripts
+
+- `npm start` - Start the development server
+- `npm run android` - Run on Android
+- `npm run ios` - Run on iOS
+- `npm run web` - Run on web
+- `npm run lint` - Check code quality
+
+## UI Components
+
+### Button
+```tsx
+import { Button } from '@/components/ui';
+
+<Button 
+  title="Click Me"
+  onPress={() => console.log('Pressed')}
+  variant="primary"  // primary | secondary | outline
+  size="medium"      // small | medium | large
+  fullWidth
+/>
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Typography
+```tsx
+import { Heading2, BodyText, Caption } from '@/components/ui';
+
+<Heading2>Welcome</Heading2>
+<BodyText>This is body text</BodyText>
+<Caption>Small caption text</Caption>
+```
+
+### Logo
+```tsx
+import { Logo } from '@/components/ui';
+
+<Logo size="medium" /> // small | medium | large
+```
+
+## Design System
+
+The app uses a consistent design system:
+- **Colors**: Defined in `constants/colors.ts`
+- **Typography**: Defined in `constants/typography.ts`
+- **Spacing**: Defined in `constants/spacing.ts`
+
+Import and use them:
+```tsx
+import { Colors, Spacing, Typography } from '@/constants';
+```
 
 ## Learn more
 
