@@ -7,12 +7,12 @@ import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { ButtonProps } from '@/types';
 import React from 'react';
 import {
-    ActivityIndicator,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    ViewStyle,
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 
 export const Button: React.FC<ButtonProps> = ({

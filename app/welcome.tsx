@@ -5,7 +5,7 @@
  */
 
 import { BodyText, Button, Heading2, Logo } from '@/components/ui';
-import { Colors, Spacing } from '@/constants';
+import { BorderRadius, Colors, Spacing } from '@/constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
@@ -31,13 +31,16 @@ export default function WelcomeScreen() {
 
         {/* Welcome Text Section */}
         <View style={styles.textContainer}>
-          <Heading2 align="center" style={styles.heading}>
-            أهلاً وسهلاً بكم تطبيق نمل
-          </Heading2>
-          
-          <BodyText align="center" color={Colors.textSecondary} style={styles.description}>
-            نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص
-          </BodyText>
+          <View style={styles.slantedTop} />
+          <View style={styles.textBackground}>
+            <Heading2 align="center" style={styles.heading}>
+              أهلاً وسهلاً بكم تطبيق نمل
+            </Heading2>
+            
+            <BodyText align="center" color={Colors.textSecondary} style={styles.description}>
+              نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص
+            </BodyText>
+          </View>
         </View>
 
         {/* Action Button */}
@@ -47,7 +50,6 @@ export default function WelcomeScreen() {
             onPress={handleJoinPress}
             variant="primary"
             size="large"
-            fullWidth
           />
         </View>
       </View>
@@ -59,9 +61,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainContent: {
-    flex: 1,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing['3xl'],
     paddingBottom: Spacing.xl,
@@ -71,20 +74,48 @@ const styles = StyleSheet.create({
     marginBottom: Spacing['2xl'],
   },
   textContainer: {
-    flex: 1,
-    justifyContent: 'center',
     marginBottom: Spacing['2xl'],
+    position: 'relative',
+  },
+  slantedTop: {
+    width: 0,
+    height: 0,
+    // backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 0,
+    borderRightWidth: 330,
+    borderBottomWidth: 20,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#F9F9EE',
+    alignSelf: 'flex-start',
+    // marginLeft: -20,
+    borderTopLeftRadius: BorderRadius.xl,
+  },
+  textBackground: {
+    backgroundColor: '#F9F9EE',
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing['3xl'],
+    paddingHorizontal: Spacing.xl,
+    // borderTopLeftRadius: BorderRadius.xl,
+    borderTopRightRadius: BorderRadius.xl,
+    borderBottomRightRadius: BorderRadius.xl,
+    borderBottomLeftRadius: BorderRadius.xl,
+    // width: 400,
+    alignSelf: 'center',
   },
   heading: {
     marginBottom: Spacing.lg,
   },
   description: {
-    paddingHorizontal: Spacing.md,
+    // paddingHorizontal: Spacing.md,
     lineHeight: 24,
   },
   buttonContainer: {
-    paddingHorizontal: Spacing.lg,
-    marginTop: 'auto',
+    position: 'absolute',
+    bottom: Spacing.xl,
+    alignSelf: 'center',
+    width: 250,
   },
 });
 

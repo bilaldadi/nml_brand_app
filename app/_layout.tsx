@@ -5,8 +5,18 @@
 
 import { Colors } from '@/constants';
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { I18nManager } from 'react-native';
 
 export default function RootLayout() {
+  useEffect(() => {
+    // Enable RTL for Arabic
+    if (!I18nManager.isRTL) {
+      I18nManager.forceRTL(true);
+      I18nManager.allowRTL(true);
+    }
+  }, []);
+
   return (
     <Stack
       screenOptions={{
@@ -19,6 +29,12 @@ export default function RootLayout() {
       <Stack.Screen name="welcome" />
       <Stack.Screen 
         name="auth/login" 
+        options={{
+          presentation: 'card',
+        }}
+      />
+      <Stack.Screen 
+        name="auth/otp" 
         options={{
           presentation: 'card',
         }}

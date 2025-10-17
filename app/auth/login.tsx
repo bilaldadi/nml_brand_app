@@ -15,14 +15,17 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    // TODO: Implement authentication logic
+    // TODO: Implement send OTP API call
     setIsLoading(true);
     
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Navigate to main app
-      router.replace('/home');
+      // Navigate to OTP screen
+      router.push({
+        pathname: '/auth/otp',
+        params: { phoneNumber },
+      });
     }, 1500);
   };
 
@@ -39,7 +42,7 @@ export default function LoginScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-            <BodyText>←</BodyText>
+            <BodyText style={styles.backArrow}>→</BodyText>
           </TouchableOpacity>
         </View>
 
@@ -103,12 +106,17 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   backButton: {
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backArrow: {
+    fontSize: Typography.sizes['2xl'],
   },
   titleContainer: {
     marginBottom: Spacing['2xl'],
