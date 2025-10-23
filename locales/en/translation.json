@@ -1,0 +1,56 @@
+{
+  "common": {
+    "search": "Search",
+    "menu": "Menu",
+    "all": "All",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back"
+  },
+  "navigation": {
+    "home": "Home",
+    "products": "Products",
+    "offers": "Offers",
+    "orders": "Orders",
+    "reports": "Reports"
+  },
+  "auth": {
+    "login": "Login",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "05XXXXXXXX",
+    "continue": "Continue",
+    "otpTitle": "Verify Phone Number",
+    "otpSubtitle": "Enter the verification code sent to",
+    "verify": "Verify",
+    "resendCode": "Resend Code",
+    "resendTimer": "You can resend after {{seconds}} seconds",
+    "terms": "By continuing, you agree to the Terms of Service and Privacy Policy",
+    "enterPhone": "Enter your phone number to continue"
+  },
+  "welcome": {
+    "title": "Welcome to NML App",
+    "description": "Welcome text welcome text welcome text welcome text welcome text welcome text welcome text welcome text welcome text",
+    "joinButton": "Join NML"
+  },
+  "home": {
+    "location": "Jeddah, Saudi Arabia",
+    "searchPlaceholder": "Search for stores or suppliers...",
+    "filters": {
+      "all": "All",
+      "accepted": "Accepted Offers",
+      "processing": "Processing Offers",
+      "noOffers": "No Offers"
+    }
+  },
+  "offers": {
+    "accepted": "Accepted Offers",
+    "processing": "Processing Offers",
+    "noOffers": "No Offers"
+  }
+}

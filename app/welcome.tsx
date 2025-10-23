@@ -1,52 +1,47 @@
 /**
  * Welcome Screen
- * First screen users see when they open the app
- * Provides option to join/login
+ * Onboarding screen with app introduction
  */
 
 import { BodyText, Button, Heading2, Logo } from '@/components/ui';
 import { BorderRadius, Colors, Spacing } from '@/constants';
 import { useRouter } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StatusBar, StyleSheet, View } from 'react-native';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleJoinPress = () => {
-    // Navigate to login/signup screen
     router.push('/auth/login');
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-      <View
-        style={styles.mainContent}
-      >
-        {/* Logo Section */}
+      <View style={styles.mainContent}>
         <View style={styles.logoContainer}>
           <Logo size="medium" />
         </View>
 
-        {/* Welcome Text Section */}
         <View style={styles.textContainer}>
           <View style={styles.slantedTop} />
           <View style={styles.textBackground}>
             <Heading2 align="center" style={styles.heading}>
-              أهلاً وسهلاً بكم تطبيق نمل
+              {t('welcome.title')}
             </Heading2>
             
             <BodyText align="center" color={Colors.textSecondary} style={styles.description}>
-              نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص تعريفي نص
+              {t('welcome.description')}
             </BodyText>
           </View>
         </View>
 
-        {/* Action Button */}
         <View style={styles.buttonContainer}>
           <Button
-            title="انضم لنمل"
+            title={t('welcome.joinButton')}
             onPress={handleJoinPress}
             variant="primary"
             size="large"
@@ -80,7 +75,7 @@ const styles = StyleSheet.create({
   slantedTop: {
     width: 0,
     height: 0,
-    // backgroundColor: 'transparent',
+    backgroundColor: 'transparent',
     borderStyle: 'solid',
     borderLeftWidth: 0,
     borderRightWidth: 330,
@@ -89,7 +84,6 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderBottomColor: '#F9F9EE',
     alignSelf: 'flex-start',
-    // marginLeft: -20,
     borderTopLeftRadius: BorderRadius.xl,
   },
   textBackground: {
@@ -97,18 +91,13 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing['3xl'],
     paddingHorizontal: Spacing.xl,
-    // borderTopLeftRadius: BorderRadius.xl,
     borderTopRightRadius: BorderRadius.xl,
-    borderBottomRightRadius: BorderRadius.xl,
-    borderBottomLeftRadius: BorderRadius.xl,
-    // width: 400,
     alignSelf: 'center',
   },
   heading: {
     marginBottom: Spacing.lg,
   },
   description: {
-    // paddingHorizontal: Spacing.md,
     lineHeight: 24,
   },
   buttonContainer: {
@@ -118,4 +107,3 @@ const styles = StyleSheet.create({
     width: 250,
   },
 });
-

@@ -1,57 +1,58 @@
 /**
  * OTP Verification Screen
- * Handles OTP verification after phone number entry
+ * 4-digit code verification with auto-submit
  */
 
-import { BodyText, Button, Caption, Heading2 } from '@/components/ui';
+import { BodyText, Button, Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 const OTP_LENGTH = 4;
-const RESEND_TIMEOUT = 60; // seconds
+const RESEND_TIMER_SECONDS = 60;
 
 export default function OTPScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { phoneNumber } = useLocalSearchParams();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isLoading, setIsLoading] = useState(false);
-  const [timer, setTimer] = useState(RESEND_TIMEOUT);
+  const [timer, setTimer] = useState(RESEND_TIMER_SECONDS);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
-  // Timer countdown
   useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    } else {
-      setCanResend(true);
-    }
-  }, [timer]);
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev === 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [canResend]);
 
   const handleOtpChange = (value: string, index: number) => {
-    // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-verify when all digits are entered
     if (value && index === OTP_LENGTH - 1) {
       const isComplete = newOtp.every(digit => digit !== '');
       if (isComplete) {
         const otpCode = newOtp.join('');
-        // Small delay for better UX
         setTimeout(() => {
           verifyOtp(otpCode);
         }, 300);
@@ -60,7 +61,6 @@ export default function OTPScreen() {
   };
 
   const handleKeyPress = (key: string, index: number) => {
-    // Handle backspace
     if (key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -70,11 +70,8 @@ export default function OTPScreen() {
     if (otpCode.length !== OTP_LENGTH) return;
 
     setIsLoading(true);
-    
-    // TODO: Implement OTP verification API call
     setTimeout(() => {
       setIsLoading(false);
-      // Navigate to main app
       router.replace('/home');
     }, 1500);
   };
@@ -86,19 +83,17 @@ export default function OTPScreen() {
 
   const handleResend = async () => {
     if (!canResend) return;
-    
-    // TODO: Implement resend OTP API call
-    setTimer(RESEND_TIMEOUT);
-    setCanResend(false);
-    setOtp(Array(OTP_LENGTH).fill(''));
-    inputRefs.current[0]?.focus();
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setTimer(RESEND_TIMER_SECONDS);
+      setCanResend(false);
+      setOtp(Array(OTP_LENGTH).fill(''));
+      inputRefs.current[0]?.focus();
+    }, 1000);
   };
 
-  const handleBackPress = () => {
-    router.back();
-  };
-
-  const isOtpComplete = otp.every(digit => digit !== '');
+  const isOtpComplete = otp.every((digit) => digit !== '');
 
   return (
     <View style={styles.container}>
@@ -106,27 +101,21 @@ export default function OTPScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <BodyText style={styles.backArrow}>→</BodyText>
           </TouchableOpacity>
         </View>
 
-        {/* Title Section */}
         <View style={styles.titleContainer}>
           <Heading2 align="center" style={styles.title}>
-            تأكيد رقم الهاتف
+            {t('auth.otpTitle')}
           </Heading2>
           <BodyText align="center" color={Colors.textSecondary} style={styles.subtitle}>
-            أدخل رمز التحقق المرسل إلى
-          </BodyText>
-          <BodyText align="center" color={Colors.textPrimary} style={styles.phoneNumber}>
-            {phoneNumber || '05XXXXXXXX'}
+            {t('auth.otpSubtitle')} {phoneNumber}
           </BodyText>
         </View>
 
-        {/* OTP Input */}
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
             <TextInput
@@ -149,10 +138,23 @@ export default function OTPScreen() {
           ))}
         </View>
 
-        {/* Verify Button */}
+        <View style={styles.resendContainer}>
+          {canResend ? (
+            <TouchableOpacity onPress={handleResend} disabled={isLoading}>
+              <BodyText color={Colors.primary} style={styles.resendText}>
+                {t('auth.resendCode')}
+              </BodyText>
+            </TouchableOpacity>
+          ) : (
+            <BodyText color={Colors.textSecondary} style={styles.resendText}>
+              {t('auth.resendTimer', { seconds: timer })}
+            </BodyText>
+          )}
+        </View>
+
         <View style={styles.buttonContainer}>
           <Button
-            title="تحقق"
+            title={t('auth.verify')}
             onPress={handleVerify}
             variant="primary"
             size="large"
@@ -160,21 +162,6 @@ export default function OTPScreen() {
             loading={isLoading}
             disabled={!isOtpComplete}
           />
-        </View>
-
-        {/* Resend Section */}
-        <View style={styles.resendContainer}>
-          {canResend ? (
-            <TouchableOpacity onPress={handleResend}>
-              <Caption color={Colors.primary}>
-                إعادة إرسال الرمز
-              </Caption>
-            </TouchableOpacity>
-          ) : (
-            <Caption color={Colors.textLight}>
-              يمكنك إعادة الإرسال بعد {timer} ثانية
-            </Caption>
-          )}
         </View>
       </ScrollView>
     </View>
@@ -189,6 +176,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   header: {
     paddingTop: Spacing.xl,
@@ -213,40 +201,35 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginTop: Spacing.sm,
-    marginBottom: Spacing.xs,
-  },
-  phoneNumber: {
-    fontWeight: Typography.weights.semibold,
-    fontSize: Typography.sizes.lg,
   },
   otpContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.md,
-    marginBottom: Spacing['2xl'],
+    justifyContent: 'space-between',
+    marginBottom: Spacing.xl,
+    paddingHorizontal: Spacing['2xl'],
   },
   otpInput: {
-    width: 56,
-    height: 64,
-    backgroundColor: Colors.background,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 2,
+    width: 50,
+    height: 50,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
     borderColor: Colors.border,
-    fontSize: Typography.sizes['2xl'],
-    fontWeight: Typography.weights.bold,
-    color: Colors.textPrimary,
     textAlign: 'center',
+    fontSize: Typography.sizes['2xl'],
+    color: Colors.textPrimary,
+    backgroundColor: Colors.background,
   },
   otpInputFilled: {
     borderColor: Colors.primary,
-    backgroundColor: Colors.white,
-  },
-  buttonContainer: {
-    marginTop: Spacing.xl,
   },
   resendContainer: {
-    marginTop: Spacing.lg,
     alignItems: 'center',
+    marginBottom: Spacing['3xl'],
+  },
+  resendText: {
+    fontSize: Typography.sizes.base,
+  },
+  buttonContainer: {
+    marginTop: 'auto',
   },
 });
-

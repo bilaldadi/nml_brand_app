@@ -1,27 +1,25 @@
 /**
  * Login Screen
- * Handles user authentication (login/signup)
+ * Phone number input for authentication
  */
 
 import { BodyText, Button, Caption, Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    // TODO: Implement send OTP API call
     setIsLoading(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      // Navigate to OTP screen
       router.push({
         pathname: '/auth/otp',
         params: { phoneNumber },
@@ -39,29 +37,26 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
             <BodyText style={styles.backArrow}>→</BodyText>
           </TouchableOpacity>
         </View>
 
-        {/* Title Section */}
         <View style={styles.titleContainer}>
           <Heading2 align="center" style={styles.title}>
-            تسجيل الدخول
+            {t('auth.login')}
           </Heading2>
           <BodyText align="center" color={Colors.textSecondary} style={styles.subtitle}>
-            أدخل رقم هاتفك للمتابعة
+            {t('auth.enterPhone')}
           </BodyText>
         </View>
 
-        {/* Phone Input */}
         <View style={styles.inputContainer}>
-          <Caption style={styles.label}>رقم الهاتف</Caption>
+          <Caption style={styles.label}>{t('auth.phoneNumber')}</Caption>
           <TextInput
             style={styles.input}
-            placeholder="05XXXXXXXX"
+            placeholder={t('auth.phonePlaceholder')}
             placeholderTextColor={Colors.textLight}
             value={phoneNumber}
             onChangeText={setPhoneNumber}
@@ -70,10 +65,9 @@ export default function LoginScreen() {
           />
         </View>
 
-        {/* Login Button */}
         <View style={styles.buttonContainer}>
           <Button
-            title="متابعة"
+            title={t('auth.continue')}
             onPress={handleLogin}
             variant="primary"
             size="large"
@@ -83,10 +77,9 @@ export default function LoginScreen() {
           />
         </View>
 
-        {/* Terms */}
         <View style={styles.termsContainer}>
           <Caption align="center" color={Colors.textLight}>
-            بالمتابعة، أنت توافق على شروط الخدمة وسياسة الخصوصية
+            {t('auth.terms')}
           </Caption>
         </View>
       </ScrollView>
@@ -152,4 +145,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
 });
-
