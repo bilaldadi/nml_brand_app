@@ -4,7 +4,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { I18nManager } from 'react-native';
+import { DevSettings, I18nManager } from 'react-native';
 import i18n from './index';
 
 interface LanguageContextType {
@@ -77,9 +77,21 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       // Update RTL/LTR layout
       I18nManager.forceRTL(language === 'ar');
       I18nManager.allowRTL(language === 'ar');
-      
-      // Note: For permanent language change, user should change iOS Settings
-      // This provides temporary override during app session
+
+      // Reload app to apply RTL/LTR layout changes across the app
+      // Try expo-updates first (if compiled in dev client), fall back to DevSettings.reload
+      try {
+        const Updates = await import('expo-updates');
+        if (Updates?.reloadAsync) {
+          await Updates.reloadAsync();
+          return;
+        }
+      } catch (_) {
+        // ignore and fall back
+      }
+      if (DevSettings?.reload) {
+        DevSettings.reload();
+      }
     } catch (error) {
       console.error('Error changing language:', error);
     }

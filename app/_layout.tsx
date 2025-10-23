@@ -6,18 +6,13 @@
 import { Colors } from '@/constants';
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
-import { I18nManager } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '../i18n'; // Initialize i18n
 import { LanguageProvider } from '../i18n/LanguageContext';
 
 export default function RootLayout() {
   useEffect(() => {
-    // Enable RTL for Arabic
-    if (!I18nManager.isRTL) {
-      I18nManager.forceRTL(true);
-      I18nManager.allowRTL(true);
-    }
+    // RTL is controlled by LanguageProvider (based on user/device language)
   }, []);
 
   return (
