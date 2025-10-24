@@ -73,7 +73,7 @@ export default function OTPScreen() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      router.replace('/home');
+      router.replace('/(tabs)/home');
     }, 1500);
   };
 

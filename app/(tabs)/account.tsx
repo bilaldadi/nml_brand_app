@@ -1,4 +1,3 @@
-import { BottomNavigation } from '@/components/ui/BottomNavigation';
 import { BodyText } from '@/components/ui/Typography';
 import { Colors, Spacing, Typography } from '@/constants';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -64,20 +63,13 @@ export default function AccountScreen() {
     },
   ];
 
-  const tabs = [
-    { id: 'reports', label: t('navigation.reports'), icon: 'bar-chart-3', onPress: () => router.push('/reports') },
-    { id: 'orders', label: t('navigation.orders'), icon: 'package', onPress: () => router.push('/orders') },
-    { id: 'offers', label: t('navigation.offers'), icon: 'percent', onPress: () => router.push('/offers') },
-    { id: 'products', label: t('navigation.products'), icon: 'grid-3x3', onPress: () => router.push('/products') },
-    { id: 'home', label: t('navigation.home'), icon: 'home', onPress: () => router.push('/home') },
-  ];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('account.title')}</Text>
         <TouchableOpacity style={styles.headerBack} onPress={() => router.back()}>
-          <Text style={styles.backArrow}>{isRTL ? '→' : '←'}</Text>
+        <BodyText style={styles.backArrow}>→</BodyText> 
         </TouchableOpacity>
       </View>
 
@@ -95,7 +87,7 @@ export default function AccountScreen() {
         ))}
       </ScrollView>
 
-      <BottomNavigation tabs={tabs.map((t, idx) => ({ ...t, active: t.id === 'home' && false }))} />
+      {/* Account screen is outside tabs; no BottomNavigation here */}
     </View>
   );
 }

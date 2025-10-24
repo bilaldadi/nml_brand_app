@@ -1,16 +1,15 @@
 /**
- * Home Screen Entry Point
+ * Home Screen (Tabs)
  * Main map-based screen showing suppliers and offers
  */
 
-import { BottomNavigation, NavigationTab } from '@/components/ui';
 import { Colors, MarkerType } from '@/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StatusBar, StyleSheet, View } from 'react-native';
 
-import { FilterOption, FilterTags, Header, MapControls, MapMarker, MapView, SearchBar } from './home/components';
+import { FilterOption, FilterTags, Header, MapControls, MapMarker, MapView, SearchBar } from '../home/components';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -53,14 +52,6 @@ export default function HomeScreen() {
     },
   ];
 
-  const navigationTabs: NavigationTab[] = [
-    { id: 'home', label: t('navigation.home'), icon: 'home', active: true, onPress: () => {} },
-    { id: 'products', label: t('navigation.products'), icon: 'grid-3x3', active: false, onPress: () => router.push('/products') },
-    { id: 'offers', label: t('navigation.offers'), icon: 'percent', active: false, onPress: () => router.push('/offers') },
-    { id: 'orders', label: t('navigation.orders'), icon: 'package', active: false, onPress: () => router.push('/orders') },
-    { id: 'reports', label: t('navigation.reports'), icon: 'bar-chart-3', active: false, onPress: () => router.push('/reports') },
-  ];
-
   const filters: FilterOption[] = [
     { type: 'all', label: t('home.filters.all'), color: Colors.primary, showIcon: false },
     { type: 'accepted', label: t('home.filters.accepted'), color: '#4CAF50' },
@@ -78,31 +69,17 @@ export default function HomeScreen() {
     : markers.filter(marker => marker.type === activeFilter);
 
   const handleProfilePress = () => {
-    // TODO: Navigate to profile
     router.push('/account');
   };
 
-  const handleNotificationPress = () => {
-    // TODO: Navigate to notifications
-  };
-
-  const handleMapPress = () => {
-    // TODO: Handle map view toggle
-  };
-
-  const handleTargetPress = () => {
-    // TODO: Handle location targeting
-  };
-
-  const handleMenuPress = () => {
-    // TODO: Handle menu toggle
-  };
+  const handleNotificationPress = () => {};
+  const handleMapPress = () => {};
+  const handleTargetPress = () => {};
+  const handleMenuPress = () => {};
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
-      
-      {/* Full Screen Map */}
       <View style={styles.mapContainer}>
         <MapView
           markers={filteredMarkers}
@@ -111,7 +88,6 @@ export default function HomeScreen() {
           getMarkerColor={getMarkerColor}
         />
 
-        {/* Overlay Components */}
         <Header
           onProfilePress={handleProfilePress}
           onNotificationPress={handleNotificationPress}
@@ -134,9 +110,6 @@ export default function HomeScreen() {
           onMenuPress={handleMenuPress}
         />
       </View>
-
-      {/* Bottom Navigation */}
-      <BottomNavigation tabs={navigationTabs} />
     </View>
   );
 }
@@ -151,3 +124,5 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
 });
+
+
