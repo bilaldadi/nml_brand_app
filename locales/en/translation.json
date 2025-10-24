@@ -52,5 +52,14 @@
     "accepted": "Accepted Offers",
     "processing": "Processing Offers",
     "noOffers": "No Offers"
+  },
+  "account": {
+    "title": "My Account",
+    "accountInfo": "Account Information",
+    "language": "Language",
+    "faq": "FAQ",
+    "privacy": "Privacy Policy",
+    "contactUs": "Contact Us",
+    "logout": "Logout"
   }
 }

@@ -52,5 +52,14 @@
     "accepted": "عروض مقبولة",
     "processing": "عروض تحت الإجراء",
     "noOffers": "لا يوجد عروض"
+  },
+  "account": {
+    "title": "حسابي",
+    "accountInfo": "معلومات الحساب",
+    "language": "اللغة",
+    "faq": "الأسئلة الشائعة",
+    "privacy": "سياسة الخصوصية",
+    "contactUs": "اتصل بنا",
+    "logout": "الخروج"
   }
 }

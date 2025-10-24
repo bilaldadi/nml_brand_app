@@ -8,8 +8,7 @@ import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-
+import { I18nManager, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 const OTP_LENGTH = 4;
 const RESEND_TIMER_SECONDS = 60;
 
@@ -22,6 +21,8 @@ export default function OTPScreen() {
   const [timer, setTimer] = useState(RESEND_TIMER_SECONDS);
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  const isRTL = I18nManager.isRTL;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -103,10 +104,9 @@ export default function OTPScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <BodyText style={styles.backArrow}>→</BodyText>
+            {isRTL ? <BodyText style={styles.backArrow}>←</BodyText> : <BodyText style={styles.backArrow}>→</BodyText>}
           </TouchableOpacity>
         </View>
-
         <View style={styles.titleContainer}>
           <Heading2 align="center" style={styles.title}>
             {t('auth.otpTitle')}
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
   },
   header: {
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xl*2,
     paddingBottom: Spacing.lg,
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -230,6 +230,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.base,
   },
   buttonContainer: {
-    marginTop: 'auto',
+   
   },
 });

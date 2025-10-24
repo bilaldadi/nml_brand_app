@@ -8,14 +8,14 @@ import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { I18nManager, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const isRTL = I18nManager.isRTL;
   const handleLogin = async () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -39,7 +39,7 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-            <BodyText style={styles.backArrow}>→</BodyText>
+            {isRTL ? <BodyText style={styles.backArrow}>←</BodyText> : <BodyText style={styles.backArrow}>→</BodyText>}
           </TouchableOpacity>
         </View>
 
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
   },
   header: {
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.xl*2,
     paddingBottom: Spacing.lg,
     flexDirection: 'row',
     justifyContent: 'flex-end',

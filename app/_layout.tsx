@@ -5,15 +5,14 @@
 
 import { Colors } from '@/constants';
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import '../i18n'; // Initialize i18n
 import { LanguageProvider } from '../i18n/LanguageContext';
 
 export default function RootLayout() {
-  useEffect(() => {
-    // RTL is controlled by LanguageProvider (based on user/device language)
-  }, []);
+  // useEffect(() => {
+  //   // RTL is controlled by LanguageProvider (based on user/device language)
+  // }, []);
 
   return (
     <SafeAreaProvider>
@@ -27,6 +26,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="welcome" />
+          <Stack.Screen name="account" />
           <Stack.Screen 
             name="auth/login" 
             options={{

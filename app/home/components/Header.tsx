@@ -3,7 +3,6 @@
  * Top overlay header with profile, location, and notifications
  */
 
-import { LanguageSwitcher } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { Bell, MapPin, User } from 'lucide-react-native';
 import React from 'react';
@@ -28,7 +27,6 @@ export const Header: React.FC<HeaderProps> = ({
         <Text style={styles.locationText}>{t('home.location')}</Text>
       </View>
       <View style={styles.headerRight}>
-        <LanguageSwitcher style={styles.languageSwitcher} />
         <TouchableOpacity style={styles.notificationButton} onPress={onNotificationPress}>
           <Bell size={24} color={Colors.white} />
         </TouchableOpacity>
@@ -91,8 +89,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-  },
-  languageSwitcher: {
-    marginRight: Spacing.xs,
   },
 });

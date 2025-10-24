@@ -79,6 +79,7 @@ export default function HomeScreen() {
 
   const handleProfilePress = () => {
     // TODO: Navigate to profile
+    router.push('/account');
   };
 
   const handleNotificationPress = () => {
