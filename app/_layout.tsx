@@ -27,7 +27,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" />
-          <Stack.Screen name="welcome" />
+          <Stack.Screen name="welcome"/>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen 
             name="auth/login" 
@@ -41,7 +41,6 @@ export default function RootLayout() {
               presentation: 'card',
             }}
           />
-          {/* Tab routes live under /(tabs) now */}
         </Stack>
       </LanguageProvider>
     </SafeAreaProvider>

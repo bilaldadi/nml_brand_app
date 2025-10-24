@@ -31,7 +31,8 @@
     "resendCode": "Resend Code",
     "resendTimer": "You can resend after {{seconds}} seconds",
     "terms": "By continuing, you agree to the Terms of Service and Privacy Policy",
-    "enterPhone": "Enter your phone number to continue"
+    "enterPhone": "Enter your phone number to continue",
+    "invalidPhone": "Please enter a valid Saudi phone number"
   },
   "welcome": {
     "title": "Welcome to NML App",

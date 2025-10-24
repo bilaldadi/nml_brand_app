@@ -6,6 +6,5 @@
 import { Redirect } from 'expo-router';
 
 export default function Index() {
-  // After welcome, you can navigate to /(tabs)/home
-  return <Redirect href="/(tabs)/home" />;
+  return <Redirect href="/welcome" />;
 }
