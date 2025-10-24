@@ -10,6 +10,9 @@ import { useTranslation } from 'react-i18next';
 import { StatusBar, StyleSheet, View } from 'react-native';
 
 import { FilterOption, FilterTags, Header, MapControls, MapMarker, MapView, SearchBar } from '../home/components';
+import { AcceptedModal } from '../home/mapPinsModals/acceptedModal';
+import { NoOfferModal } from '../home/mapPinsModals/noOfferModal';
+import { ProcessingModal } from '../home/mapPinsModals/processingModal';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -17,6 +20,11 @@ export default function HomeScreen() {
   const [activeFilter, setActiveFilter] = useState<MarkerType | 'all' | 'no_offers' | 'suppliers' | 'outlets'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [mapReady, setMapReady] = useState(false);
+  const [mapStyle, setMapStyle] = useState<'streets' | 'satellite'>('streets');
+  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
+  const [acceptedModalVisible, setAcceptedModalVisible] = useState(false);
+  const [processingModalVisible, setProcessingModalVisible] = useState(false);
+  const [noOfferModalVisible, setNoOfferModalVisible] = useState(false);
 
   // Mock map markers with real Jeddah coordinates
   const markers: MapMarker[] = [
@@ -73,19 +81,34 @@ export default function HomeScreen() {
   };
 
   const handleNotificationPress = () => {};
-  const handleMapPress = () => {};
+  const handleMapPress = () => {
+    setMapStyle(mapStyle === 'streets' ? 'satellite' : 'streets');
+  };
   const handleTargetPress = () => {};
   const handleMenuPress = () => {};
 
+  // Handle marker press
+  const handleMarkerPress = (marker: MapMarker) => {
+    setSelectedMarker(marker);
+    if (marker.type === 'accepted') {
+      setAcceptedModalVisible(true);
+    } else if (marker.type === 'processing') {
+      setProcessingModalVisible(true);
+    } else if (marker.type === 'no_offers') {
+      setNoOfferModalVisible(true);
+    }
+  };
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.primary} />
       <View style={styles.mapContainer}>
         <MapView
           markers={filteredMarkers}
+          onMarkerPress={handleMarkerPress}
           mapReady={mapReady}
           onMapReady={() => setMapReady(true)}
           getMarkerColor={getMarkerColor}
+          mapStyle={mapStyle}
         />
 
         <Header
@@ -110,6 +133,56 @@ export default function HomeScreen() {
           onMenuPress={handleMenuPress}
         />
       </View>
+
+      {/* Modal Overlay */}
+      {(acceptedModalVisible || processingModalVisible || noOfferModalVisible) && (
+        <View style={styles.modalOverlay} />
+      )}
+
+      {/* Accepted Marker Modal */}
+      <AcceptedModal
+        visible={acceptedModalVisible}
+        onClose={() => setAcceptedModalVisible(false)}
+        outletData={
+          selectedMarker
+            ? {
+                name: 'بنده',
+                location: 'حي الروضة، شارع الأمير',
+                neighborhood: 'الروضة',
+              }
+            : undefined
+        }
+      />
+
+      {/* Processing Marker Modal */}
+      <ProcessingModal
+        visible={processingModalVisible}
+        onClose={() => setProcessingModalVisible(false)}
+        outletData={
+          selectedMarker
+            ? {
+                name: 'بنده',
+                location: 'حي الروضة، شارع الأمير',
+                neighborhood: 'الروضة',
+              }
+            : undefined
+        }
+      />
+
+      {/* No Offer Marker Modal */}
+      <NoOfferModal
+        visible={noOfferModalVisible}
+        onClose={() => setNoOfferModalVisible(false)}
+        outletData={
+          selectedMarker
+            ? {
+                name: 'بنده',
+                location: 'حي الروضة، شارع الأمير',
+                neighborhood: 'الروضة',
+              }
+            : undefined
+        }
+      />
     </View>
   );
 }
@@ -122,6 +195,15 @@ const styles = StyleSheet.create({
   mapContainer: {
     flex: 1,
     position: 'relative',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.overlay,
+    zIndex: 999,
   },
 });
 

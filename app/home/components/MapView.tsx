@@ -6,7 +6,7 @@
 import { MAPBOX_CONFIG, MarkerType } from '@/constants';
 import Mapbox from '@rnmapbox/maps';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ShoppingCartIcon } from './ShoppingCartIcon';
 
 // Initialize Mapbox
@@ -24,6 +24,8 @@ interface MapViewProps {
   mapReady: boolean;
   onMapReady: () => void;
   getMarkerColor: (type: MarkerType | 'no_offers' | 'accepted' | 'processing') => string;
+  mapStyle?: 'streets' | 'satellite';
+  onMarkerPress: (marker: MapMarker) => void;
 }
 
 export const MapView: React.FC<MapViewProps> = ({
@@ -31,11 +33,24 @@ export const MapView: React.FC<MapViewProps> = ({
   mapReady,
   onMapReady,
   getMarkerColor,
+  onMarkerPress,
+  mapStyle = 'streets',
 }) => {
+  const getMapStyleURL = () => {
+    if (mapStyle === 'satellite') {
+      return 'mapbox://styles/mapbox/satellite-streets-v12';
+    }
+    return MAPBOX_CONFIG.MAP_STYLE;
+  };
+
+  const handleMarkerPress = (marker: MapMarker) => {
+    onMarkerPress(marker);
+  };
+
   return (
     <Mapbox.MapView
       style={styles.map}
-      styleURL={MAPBOX_CONFIG.MAP_STYLE}
+      styleURL={getMapStyleURL()}
       onDidFinishLoadingMap={onMapReady}
       attributionEnabled={false}
       logoEnabled={false}
@@ -55,8 +70,13 @@ export const MapView: React.FC<MapViewProps> = ({
           key={marker.id}
           id={marker.id}
           coordinate={marker.coordinates}
+          onSelected={() => handleMarkerPress(marker)}
         >
-          <View style={styles.markerContainer}>
+          <TouchableOpacity 
+            style={styles.markerContainer}
+            activeOpacity={0.7}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <ShoppingCartIcon
               size={50}
               color={
@@ -71,7 +91,7 @@ export const MapView: React.FC<MapViewProps> = ({
               }
               showBorder={marker.type === 'processing'}
             />
-          </View>
+          </TouchableOpacity>
         </Mapbox.PointAnnotation>
       ))}
     </Mapbox.MapView>
