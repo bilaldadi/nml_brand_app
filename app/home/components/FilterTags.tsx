@@ -4,7 +4,7 @@
  */
 
 import { BorderRadius, Colors, MarkerType, Spacing, Typography } from '@/constants';
-import { MapPin } from 'lucide-react-native';
+import { Location } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -46,9 +46,10 @@ export const FilterTags: React.FC<FilterTagsProps> = ({
             onPress={() => onFilterPress(filter.type)}
           >
             {filter.showIcon !== false && (
-              <MapPin 
+              <Location 
                 size={13} 
                 color={filter.color}
+                variant="Bold"
               />
             )}
             <Text 

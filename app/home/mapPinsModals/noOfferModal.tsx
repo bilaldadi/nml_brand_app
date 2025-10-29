@@ -4,7 +4,8 @@
  */
 
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { MapPin, MessageCircle, Package, Percent, Phone, Shirt, X } from 'lucide-react-native';
+import { useOffer } from '@/contexts/OfferContext';
+import { Box, Call, CloseCircle, DiscountCircle, Location, Message, Tag } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -29,17 +30,18 @@ export const NoOfferModal: React.FC<NoOfferModalProps> = ({
   },
 }) => {
   const { t } = useTranslation();
+  const { clearProducts } = useOffer();
 
   const actionButtons = [
-    { id: 'call', icon: Phone, label: 'اتصال', color: Colors.primary },
-    { id: 'message', icon: MessageCircle, label: 'رسائل', color: Colors.primary },
-    { id: 'directions', icon: MapPin, label: 'الاتجاه', color: Colors.primary },
+    { id: 'call', icon: Call, label: 'اتصال', color: Colors.primary },
+    { id: 'message', icon: Message, label: 'رسائل', color: Colors.primary },
+    { id: 'directions', icon: Location, label: 'الاتجاه', color: Colors.primary },
   ];
 
   const productCategories = [
-    { id: 'clothes', icon: Shirt, label: 'ملابس', color: Colors.primary },
-    { id: 'products', icon: Package, label: 'جوالات', color: Colors.primary },
-    { id: 'accessories', icon: Percent, label: 'اكسسوارات', color: Colors.primary },
+    { id: 'clothes', icon: Tag, label: 'ملابس', color: Colors.primary },
+    { id: 'products', icon: Box, label: 'جوالات', color: Colors.primary },
+    { id: 'accessories', icon: DiscountCircle, label: 'اكسسوارات', color: Colors.primary },
   ];
 
   return (
@@ -55,7 +57,7 @@ export const NoOfferModal: React.FC<NoOfferModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.headerTitle}>تفاصيل منفذ البيع</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={Colors.textPrimary} />
+              <CloseCircle size={24} color={Colors.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -75,7 +77,7 @@ export const NoOfferModal: React.FC<NoOfferModalProps> = ({
             <View style={styles.actionButtons}>
               {actionButtons.map((button) => (
                 <TouchableOpacity key={button.id} style={styles.actionButton}>
-                  <button.icon size={20} color={button.color} />
+                  <button.icon size={20} color={button.color} variant="Bold" />
                   <Text style={styles.actionButtonText}>{button.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -87,7 +89,7 @@ export const NoOfferModal: React.FC<NoOfferModalProps> = ({
               <View style={styles.categoryButtons}>
                 {productCategories.map((category) => (
                   <TouchableOpacity key={category.id} style={styles.categoryButton}>
-                    <category.icon size={20} color={category.color} />
+                    <category.icon size={20} color={category.color} variant="Bold" />
                     <Text style={styles.categoryButtonText}>{category.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -96,7 +98,18 @@ export const NoOfferModal: React.FC<NoOfferModalProps> = ({
 
             {/* Send Offer Button */}
             <View style={styles.section}>
-              <TouchableOpacity style={styles.sendOfferButton}>
+              <TouchableOpacity 
+                style={styles.sendOfferButton}
+                onPress={() => {
+                  // Clear any existing products from previous offer
+                  // clearProducts();
+                  onClose();
+                  // Small delay to ensure modal closes before navigation
+                  setTimeout(() => {
+                    require('expo-router').router.push('/offers/add-offer');
+                  }, 300);
+                }}
+              >
                 <Text style={styles.sendOfferButtonText}>أرسل عرض على التصريف</Text>
               </TouchableOpacity>
             </View>

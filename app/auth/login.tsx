@@ -110,11 +110,11 @@ export default function LoginScreen() {
           />
         </View>
 
-        <View style={styles.termsContainer}>
+        {/* <View style={styles.termsContainer}>
           <Caption align="center" color={Colors.textLight}>
             {t('auth.terms')}
           </Caption>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );

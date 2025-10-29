@@ -4,7 +4,7 @@
  */
 
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Bell, MapPin, User } from 'lucide-react-native';
+import { Location, Notification, UserSquare } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -23,15 +23,15 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <View style={styles.overlayHeader}>
       <View style={styles.locationInfo}>
-        <MapPin size={16} color={Colors.white} />
+        <Location size={16} color={Colors.white} variant="Bold" />
         <Text style={styles.locationText}>{t('home.location')}</Text>
       </View>
       <View style={styles.headerRight}>
         <TouchableOpacity style={styles.notificationButton} onPress={onNotificationPress}>
-          <Bell size={24} color={Colors.white} />
+          <Notification size={24} color={Colors.white} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.profileButton} onPress={onProfilePress}>
-          <User size={24} color={Colors.white} />
+          <UserSquare size={24} color={Colors.white}/>
         </TouchableOpacity>
       </View>
     </View>

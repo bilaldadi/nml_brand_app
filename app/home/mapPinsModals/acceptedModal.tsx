@@ -4,7 +4,7 @@
  */
 
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Check, CheckCircle2, MapPin, MessageCircle, Package, Percent, Phone, Shirt, Truck, X } from 'lucide-react-native';
+import { Box, Call, CloseCircle, DiscountCircle, Location, Message, Tag, TickCircle, Truck } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -31,23 +31,23 @@ export const AcceptedModal: React.FC<AcceptedModalProps> = ({
   const { t } = useTranslation();
 
   const actionButtons = [
-    { id: 'call', icon: Phone, label: 'اتصال', color: Colors.primary },
-    { id: 'message', icon: MessageCircle, label: 'رسائل', color: Colors.primary },
-    { id: 'directions', icon: MapPin, label: 'الاتجاه', color: Colors.primary },
+    { id: 'call', icon: Call, label: 'اتصال', color: Colors.primary },
+    { id: 'message', icon: Message, label: 'رسائل', color: Colors.primary },
+    { id: 'directions', icon: Location, label: 'الاتجاه', color: Colors.primary },
   ];
 
   const productCategories = [
-    { id: 'clothes', icon: Shirt, label: 'ملابس', color: Colors.primary },
-    { id: 'products', icon: Package, label: 'جوالات', color: Colors.primary },
-    { id: 'accessories', icon: Percent, label: 'اكسسوارات', color: Colors.primary },
+    { id: 'clothes', icon: Tag, label: 'ملابس', color: Colors.primary },
+    { id: 'products', icon: Box, label: 'جوالات', color: Colors.primary },
+    { id: 'accessories', icon: DiscountCircle, label: 'اكسسوارات', color: Colors.primary },
   ];
 
   const statusSteps = [
-    { id: 1, label: 'قبول العرض', icon: CheckCircle2, active: true, completed: true },
-    { id: 2, label: 'تجهيز الطلب', icon: Package, active: true, completed: true },
+    { id: 1, label: 'قبول العرض', icon: TickCircle, active: true, completed: true },
+    { id: 2, label: 'تجهيز الطلب', icon: Box, active: true, completed: true },
     { id: 3, label: 'مع المندوب', icon: Truck, active: true, completed: true },
-    { id: 4, label: 'في الموقع', icon: MapPin, active: true, completed: true },
-    { id: 5, label: 'على الرف', icon: Check, active: true, completed: false },
+    { id: 4, label: 'في الموقع', icon: Location, active: true, completed: true },
+    { id: 5, label: 'على الرف', icon: TickCircle, active: true, completed: false },
   ];
 
   return (
@@ -63,7 +63,7 @@ export const AcceptedModal: React.FC<AcceptedModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.headerTitle}>تفاصيل منفذ البيع</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={Colors.textPrimary} />
+              <CloseCircle size={24} color={Colors.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -83,7 +83,7 @@ export const AcceptedModal: React.FC<AcceptedModalProps> = ({
             <View style={styles.actionButtons}>
               {actionButtons.map((button) => (
                 <TouchableOpacity key={button.id} style={styles.actionButton}>
-                  <button.icon size={20} color={button.color} />
+                  <button.icon size={20} color={button.color} variant="Bold" />
                   <Text style={styles.actionButtonText}>{button.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -95,7 +95,7 @@ export const AcceptedModal: React.FC<AcceptedModalProps> = ({
               <View style={styles.categoryButtons}>
                 {productCategories.map((category) => (
                   <TouchableOpacity key={category.id} style={styles.categoryButton}>
-                    <category.icon size={20} color={category.color} />
+                    <category.icon size={20} color={category.color} variant="Bold" />
                     <Text style={styles.categoryButtonText}>{category.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -118,7 +118,8 @@ export const AcceptedModal: React.FC<AcceptedModalProps> = ({
                         >
                           <IconComponent 
                             size={16} 
-                            color={step.completed ? Colors.white : Colors.textSecondary} 
+                            color={step.completed ? Colors.white : Colors.textSecondary}
+                            variant="Bold"
                           />
                         </View>
                         {index < statusSteps.length - 1 && (
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   timelineLabel: {
-    fontSize: 10,
+    fontSize: 12,
     color: Colors.textSecondary,
   },
   timelineLabelCompleted: {

@@ -23,7 +23,7 @@ export default function TabsLayout() {
         const activeIndex = state.index;
 
         const tabs = [
-          { id: 'home', label: t('navigation.home'), icon: 'home', onPress: () => navigation.navigate('home') },
+          { id: 'home', label: t('navigation.home'), icon: 'home2', onPress: () => navigation.navigate('home') },
           { id: 'products', label: t('navigation.products'), icon: 'grid-3x3', onPress: () => navigation.navigate('products') },
           { id: 'offers', label: t('navigation.offers'), icon: 'percent', onPress: () => navigation.navigate('offers') },
           { id: 'orders', label: t('navigation.orders'), icon: 'package', onPress: () => navigation.navigate('orders') },

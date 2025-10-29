@@ -4,7 +4,7 @@
  */
 
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Map, Menu, Target } from 'lucide-react-native';
+import { Gps, HambergerMenu, Map1 } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -27,13 +27,13 @@ export const MapControls: React.FC<MapControlsProps> = ({
       {/* Map Control Buttons */}
       <View style={styles.mapControls}>
         <TouchableOpacity style={styles.mapButton} onPress={onMapPress}>
-          <Map size={20} color={Colors.textPrimary} />
+          <Map1 size={25} color={Colors.textPrimary} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.mapButton} onPress={onTargetPress}>
-          <Target size={20} color={Colors.textPrimary} />
+          <Gps size={25} color={Colors.textPrimary} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuButton} onPress={onMenuPress}>
-          <Menu size={24} color={Colors.textPrimary} />
+          <HambergerMenu size={25} color={Colors.textPrimary} />
           <Text style={styles.menuText}>{t('common.menu')}</Text>
         </TouchableOpacity>
       </View>

@@ -35,7 +35,8 @@
         {
           "RNMapboxMapsImpl": "mapbox"
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

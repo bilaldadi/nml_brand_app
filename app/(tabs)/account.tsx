@@ -2,7 +2,7 @@ import { BodyText } from '@/components/ui/Typography';
 import { Colors, Spacing, Typography } from '@/constants';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useRouter } from 'expo-router';
-import { Globe, HelpCircle, LogOut, MapPin, PhoneCall, User2 } from 'lucide-react-native';
+import { Call, Global, LogoutCurve, MessageQuestion, SecuritySafe, Shop } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { I18nManager, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -23,16 +23,16 @@ export default function AccountScreen() {
     {
       id: 'info',
       label: t('account.accountInfo'),
-      icon: <User2 size={20} color={Colors.textSecondary} />,
+      icon: <Shop size={20} color={Colors.textSecondary} />,
       onPress: () => {},
     },
     {
       id: 'language',
       label: t('account.language'),
+      icon: <Global size={18} color={Colors.textSecondary} />,
       right: (
         <View style={styles.langRight}>
-          <Text style={styles.langCode}>{currentLanguage === 'ar' ? 'العربية' : 'English'}</Text>
-          <Globe size={18} color={Colors.textSecondary} />
+          <Text style={styles.langCode}>{currentLanguage === 'ar' ? 'العربية' : 'English'}</Text>  
         </View>
       ),
       onPress: handleToggleLanguage,
@@ -40,25 +40,25 @@ export default function AccountScreen() {
     {
       id: 'faq',
       label: t('account.faq'),
-      icon: <HelpCircle size={20} color={Colors.textSecondary} />,
+      icon: <MessageQuestion size={20} color={Colors.textSecondary} />,
       onPress: () => {},
     },
     {
       id: 'privacy',
       label: t('account.privacy'),
-      icon: <MapPin size={20} color={Colors.textSecondary} />,
+      icon: <SecuritySafe size={20} color={Colors.textSecondary} />,
       onPress: () => {},
     },
     {
       id: 'contact',
       label: t('account.contactUs'),
-      icon: <PhoneCall size={20} color={Colors.textSecondary} />,
+      icon: <Call size={20} color={Colors.textSecondary} />,
       onPress: () => {},
     },
     {
       id: 'logout',
       label: t('account.logout'),
-      icon: <LogOut size={20} color={Colors.textSecondary} />,
+      icon: <LogoutCurve size={20} color={Colors.textSecondary} />,
       onPress: () => {},
     },
   ];

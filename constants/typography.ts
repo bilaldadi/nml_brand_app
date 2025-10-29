@@ -1,6 +1,7 @@
 /**
  * Typography constants for the NML brand app
  * Supports both Arabic (RTL) and English (LTR)
+ * Using Noto Sans Arabic font family
  */
 
 export const Typography = {
@@ -23,6 +24,14 @@ export const Typography = {
     medium: '500' as const,
     semibold: '600' as const,
     bold: '700' as const,
+  },
+  
+  // Font Families (Noto Sans Arabic)
+  fonts: {
+    regular: 'NotoSansArabic_400Regular',
+    medium: 'NotoSansArabic_500Medium',
+    semibold: 'NotoSansArabic_600SemiBold',
+    bold: 'NotoSansArabic_700Bold',
   },
   
   // Line Heights

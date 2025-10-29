@@ -4,7 +4,7 @@
  */
 
 import { Colors, Spacing, Typography } from '@/constants';
-import { BarChart3, Grid3X3, Home, Package, Percent } from 'lucide-react-native';
+import { Box, Category, Diagram, DiscountShape, Home2 } from 'iconsax-react-native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,23 +23,23 @@ interface BottomNavigationProps {
 
 const getIcon = (iconName: string, isActive: boolean) => {
   const iconProps = {
-    size: 20,
+    size: 22,
     color: isActive ? Colors.primary : Colors.textSecondary,
   };
 
   switch (iconName) {
     case 'home':
-      return <Home {...iconProps} />;
+      return <Home2 {...iconProps} />;
     case 'grid-3x3':
-      return <Grid3X3 {...iconProps} />;
+      return <Category {...iconProps} />;
     case 'percent':
-      return <Percent {...iconProps} />;
+      return <DiscountShape {...iconProps} />;
     case 'package':
-      return <Package {...iconProps} />;
+      return <Box {...iconProps} />;
     case 'bar-chart-3':
-      return <BarChart3 {...iconProps} />;
+      return <Diagram {...iconProps} />;
     default:
-      return <Home {...iconProps} />;
+      return <Home2 {...iconProps} />;
   }
 };
 

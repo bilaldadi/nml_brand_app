@@ -4,7 +4,7 @@
  */
 
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Search } from 'lucide-react-native';
+import { SearchNormal1 } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, TextInput, View } from 'react-native';
@@ -32,7 +32,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           value={value}
           onChangeText={onChangeText}
         />
-        <Search size={20} color={Colors.textLight} />
+        <SearchNormal1 size={20} color={Colors.textLight} />
       </View>
     </View>
   );
