@@ -11,14 +11,14 @@ import { SaudiRiyal } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    I18nManager,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  I18nManager,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function AddProductScreen() {
@@ -58,10 +58,13 @@ export default function AddProductScreen() {
   ];
 
   const handleAddProduct = () => {
-    // Add product to global state
+    // Add product to global state with all details
     addProduct({
       name: selectedProduct,
       emoji: selectedProductEmoji,
+      price: parseFloat(proposedPrice) || 10,
+      quantity: parseFloat(quantity) || 10,
+      commission: parseFloat(commission) || 2,
     });
 
     // Navigate back to add-offer screen
@@ -292,7 +295,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: Colors.primary,
-    paddingTop: Spacing['2xl'],
+    paddingTop: Spacing['3xl'],
     paddingBottom: Spacing.lg,
     paddingHorizontal: Spacing.lg,
     alignItems: 'center',
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: Colors.white,
-    fontSize: Typography.sizes['2xl'],
+    fontSize: Typography.sizes.base,
     fontWeight: Typography.weights.bold,
   },
   backButton: {

@@ -15,6 +15,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { I18nManager } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { OfferProvider } from '../contexts/OfferContext';
 import '../i18n'; // Initialize i18n
@@ -79,35 +80,37 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <LanguageProvider>
-        <OfferProvider>
-          <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: Colors.background },
-            animation: I18nManager.isRTL ? 'slide_from_left' : 'slide_from_right',
-            gestureDirection: 'horizontal',
-          }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="welcome"/>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen 
-            name="auth/login" 
-            options={{
-              presentation: 'card',
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <LanguageProvider>
+          <OfferProvider>
+            <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: Colors.background },
+              animation: I18nManager.isRTL ? 'slide_from_left' : 'slide_from_right',
+              gestureDirection: 'horizontal',
             }}
-          />
-          <Stack.Screen 
-            name="auth/otp" 
-            options={{
-              presentation: 'card',
-            }}
-          />
-        </Stack>
-        </OfferProvider>
-      </LanguageProvider>
-    </SafeAreaProvider>
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen name="welcome"/>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen 
+              name="auth/login" 
+              options={{
+                presentation: 'card',
+              }}
+            />
+            <Stack.Screen 
+              name="auth/otp" 
+              options={{
+                presentation: 'card',
+              }}
+            />
+          </Stack>
+          </OfferProvider>
+        </LanguageProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
