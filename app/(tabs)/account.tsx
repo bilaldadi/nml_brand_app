@@ -1,7 +1,7 @@
 import { BodyText } from '@/components/ui/Typography';
 import { Colors, Spacing, Typography } from '@/constants';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Call, Global, LogoutCurve, MessageQuestion, SecuritySafe, Shop } from 'iconsax-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +9,22 @@ import { I18nManager, ScrollView, StyleSheet, Text, TouchableOpacity, View } fro
 
 export default function AccountScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
 
   const isRTL = I18nManager.isRTL;
+
+  const handleBackPress = () => {
+    const returnTo = params.returnTo as string;
+    if (returnTo) {
+      router.push(returnTo as any);
+    } else if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/(tabs)/home');
+    }
+  };
 
   const handleToggleLanguage = async () => {
     const newLang = currentLanguage === 'ar' ? 'en' : 'ar';
@@ -68,7 +80,7 @@ export default function AccountScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('account.title')}</Text>
-        <TouchableOpacity style={styles.headerBack} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.headerBack} onPress={handleBackPress}>
         <BodyText style={styles.backArrow}>→</BodyText> 
         </TouchableOpacity>
       </View>

@@ -1,6 +1,6 @@
 /**
  * Root Index Screen
- * Redirects to the welcome screen
+ * Redirects directly to home
  */
 
 import { Redirect } from 'expo-router';

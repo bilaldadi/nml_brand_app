@@ -96,6 +96,24 @@ export default function RootLayout() {
             <Stack.Screen name="welcome"/>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen 
+              name="products/[id]" 
+              options={{
+                presentation: 'card',
+              }}
+            />
+            <Stack.Screen 
+              name="orders/[id]" 
+              options={{
+                presentation: 'card',
+              }}
+            />
+            <Stack.Screen 
+              name="orders/success" 
+              options={{
+                presentation: 'card',
+              }}
+            />
+            <Stack.Screen 
               name="auth/login" 
               options={{
                 presentation: 'card',

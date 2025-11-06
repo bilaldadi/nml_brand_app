@@ -3,6 +3,7 @@
  * Top overlay header with profile, location, and notifications
  */
 
+import { Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { Location, Notification, UserSquare } from 'iconsax-react-native';
 import React from 'react';
@@ -12,20 +13,28 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface HeaderProps {
   onProfilePress?: () => void;
   onNotificationPress?: () => void;
+  variant?: 'overlay' | 'normal';
+  title?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onProfilePress,
   onNotificationPress,
+  variant = 'overlay',
+  title,
 }) => {
   const { t } = useTranslation();
 
   return (
-    <View style={styles.overlayHeader}>
-      <View style={styles.locationInfo}>
-        <Location size={16} color={Colors.white} variant="Bold" />
-        <Text style={styles.locationText}>{t('home.location')}</Text>
-      </View>
+    <View style={variant === 'overlay' ? styles.overlayHeader : styles.normalHeader}>
+      {title && <Heading2 style={styles.headerTitle} align="center">{title}</Heading2>}
+        {!title &&   
+          <View style={styles.locationInfo}>
+            <Location size={16} color={Colors.white} variant="Bold" />
+            <Text style={styles.locationText}>{t('home.location')}</Text>
+          </View>
+        }
+      
       <View style={styles.headerRight}>
         <TouchableOpacity style={styles.notificationButton} onPress={onNotificationPress}>
           <Notification size={24} color={Colors.white} />
@@ -53,6 +62,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     zIndex: 10,
   },
+  normalHeader: {
+    backgroundColor: Colors.primary,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: Spacing['2xl'] + Spacing.md,
+    paddingBottom: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+  },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -77,6 +95,12 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.sm,
     color: Colors.white,
     fontWeight: Typography.weights.medium,
+  },
+  headerTitle: {
+    fontSize: Typography.sizes.xl,
+    color: Colors.white,
+    fontWeight: Typography.weights.bold,
+    textAlign: 'right',
   },
   notificationButton: {
     width: 40,

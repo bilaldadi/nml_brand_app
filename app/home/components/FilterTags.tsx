@@ -20,17 +20,19 @@ interface FilterTagsProps {
   filters: FilterOption[];
   activeFilter: MarkerType | 'all' | 'no_offers' | 'suppliers' | 'outlets';
   onFilterPress: (filterType: MarkerType | 'all' | 'no_offers' | 'suppliers' | 'outlets') => void;
+  variant?: 'overlay' | 'normal';
 }
 
 export const FilterTags: React.FC<FilterTagsProps> = ({
   filters,
   activeFilter,
   onFilterPress,
+  variant = 'overlay',
 }) => {
   const { t } = useTranslation();
   
   return (
-    <View style={styles.overlayFilterContainer}>
+    <View style={variant === 'overlay' ? styles.overlayFilterContainer : styles.normalFilterContainer}>
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -74,6 +76,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
+  },
+  normalFilterContainer: {
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
   },
   filterScroll: {
     paddingHorizontal: Spacing.lg,

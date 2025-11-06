@@ -25,7 +25,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string;
+  image: string | number; // string for emoji, number for require() image
   category: string;
   stock: number;
 }

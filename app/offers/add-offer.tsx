@@ -11,12 +11,12 @@ import { SaudiRiyal } from 'lucide-react-native';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  I18nManager,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    I18nManager,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Reanimated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
@@ -52,14 +52,14 @@ export default function AddOfferScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const isRTL = I18nManager.isRTL;
-  const { products, updateProduct, removeProduct, clearProducts } = useOffer();
+  const { products, updateProduct, removeProduct, clearProducts, addSubmittedOffer } = useOffer();
 
   // Calculate summary
   const totalProducts = products.length;
-  const totalQuantity = products.reduce((sum, p) => sum + (p.quantity || 10), 0);
-  const totalPrice = products.reduce((sum, p) => sum + ((p.price || 10) * (p.quantity || 10)), 0);
+  const totalQuantity = products.reduce((sum, p) => sum + (p.quantity || 0), 0);
+  const totalPrice = products.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
   const avgCommission = products.length > 0 
-    ? products.reduce((sum, p) => sum + (p.commission || 2), 0) / products.length 
+    ? products.reduce((sum, p) => sum + (p.commission || 0), 0) / products.length 
     : 0;
 
   const handleAddProduct = () => {
@@ -76,6 +76,17 @@ export default function AddOfferScreen() {
   };
 
   const handleSubmitOffer = () => {
+    // Save the offer before clearing
+    addSubmittedOffer({
+      outletName: 'بنده',
+      outletLocation: 'حي الروضة، شارع الأمير',
+      outletNeighborhood: 'الروضة',
+      products: [...products],
+      status: 'processing', // Start as processing
+      totalPrice,
+      totalQuantity,
+    });
+
     // Clear products after submitting
     clearProducts();
     router.push('/offers/success');

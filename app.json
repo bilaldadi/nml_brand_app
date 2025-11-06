@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "NML App",
+    "name": "NML",
     "slug": "nml-brand-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/ant.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F5F5F5"
+      "backgroundColor": "#E84650"
     },
     "assetBundlePatterns": [
       "**/*"
