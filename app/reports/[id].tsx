@@ -36,9 +36,9 @@ const getProductData = (id: string): ProductData => {
     name: 'كرواسان',
     image: require('@/assets/images/cake.png'),
     price: 150,
-    soldCount: 4000,
+    soldCount: 45,
     totalSales: 4000,
-    totalProfit: 4000,
+    totalProfit: 2300,
   };
 };
 
@@ -131,16 +131,6 @@ export default function ProductReportDetailsScreen() {
 
           {/* Product Info */}
           <View style={styles.productInfo}>
-            <View style={styles.productDetails}>
-              <Text style={styles.productName}>{productData.name}</Text>
-              <View style={styles.priceContainer}>
-                <Text style={styles.priceLabel}>سعر البيع</Text>
-                <View style={styles.priceRow}>
-                  <Text style={styles.price}>{productData.price}</Text>
-                  <SaudiRiyal size={16} color={Colors.textPrimary} />
-                </View>
-              </View>
-            </View>
             <View style={styles.productImageContainer}>
               <Image
                 source={productData.image}
@@ -148,32 +138,39 @@ export default function ProductReportDetailsScreen() {
                 resizeMode="cover"
               />
             </View>
+            <Text style={styles.productName}>{productData.name}</Text>
+            <View style={styles.priceSection}>
+              <Text style={styles.priceLabel}>سعر البيع</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.price}>{productData.price}</Text>
+                <SaudiRiyal size={16} color={Colors.textPrimary} />
+              </View>
+            </View>
           </View>
 
           {/* Statistics */}
           <View style={styles.statsContainer}>
             <View style={styles.statRow}>
+            <Text style={styles.statLabel}>عدد المنتجات المباعة</Text>
               <View style={styles.statValueContainer}>
                 <Text style={styles.statValue}>{productData.soldCount}</Text>
-                <SaudiRiyal size={18} color={Colors.textPrimary} />
               </View>
-              <Text style={styles.statLabel}>عدد المنتجات المباعة</Text>
             </View>
 
             <View style={styles.statRow}>
+            <Text style={styles.statLabel}>مجموع المبيعات</Text>
               <View style={styles.statValueContainer}>
                 <Text style={styles.statValue}>{productData.totalSales}</Text>
                 <SaudiRiyal size={18} color={Colors.textPrimary} />
               </View>
-              <Text style={styles.statLabel}>مجموع المبيعات</Text>
             </View>
 
             <View style={styles.statRow}>
+            <Text style={styles.statLabel}>إجمالي الربح</Text>
               <View style={styles.statValueContainer}>
                 <Text style={styles.statValue}>{productData.totalProfit}</Text>
                 <SaudiRiyal size={18} color={Colors.textPrimary} />
               </View>
-              <Text style={styles.statLabel}>إجمالي الربح</Text>
             </View>
           </View>
 
@@ -340,9 +337,6 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.sm,
   },
   productInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: Colors.white,
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
@@ -355,46 +349,45 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.md,
   },
-  productDetails: {
-    flex: 1,
-    alignItems: 'flex-end',
+  productImageContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.background,
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
   },
   productName: {
+    flex: 1,
     fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
-    marginBottom: Spacing.sm,
+    textAlign: 'left',
   },
-  priceContainer: {
-    alignItems: 'flex-end',
+  priceSection: {
+    alignItems: 'flex-start',
     gap: Spacing.xs,
   },
   priceLabel: {
     fontSize: Typography.sizes.sm,
     color: Colors.textSecondary,
-    textAlign: 'right',
   },
   priceRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
   },
   price: {
-    fontSize: Typography.sizes.base,
+    fontSize: Typography.sizes.xl,
     fontWeight: Typography.weights.bold,
     color: Colors.textPrimary,
-  },
-  productImageContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.white,
-    overflow: 'hidden',
-  },
-  productImage: {
-    width: '100%',
-    height: '100%',
   },
   statsContainer: {
     gap: Spacing.md,
@@ -538,7 +531,7 @@ const styles = StyleSheet.create({
   },
   iosDatePickerHeader: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     padding: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,

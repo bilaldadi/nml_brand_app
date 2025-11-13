@@ -4,13 +4,14 @@
  */
 
 import { Header } from '@/app/home/components/Header';
-import { ProductCard } from '@/app/reports/components';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
-import { ArrowDown2, Calendar } from 'iconsax-react-native';
+import { ArrowDown2, Calendar, Diagram } from 'iconsax-react-native';
+import { SaudiRiyal } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
+  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -26,6 +27,7 @@ interface Product {
   name: string;
   image: any;
   price: number;
+  sold: number;
 }
 
 export default function ReportsScreen() {
@@ -79,9 +81,9 @@ export default function ReportsScreen() {
   // Sample data - replace with real data
   const salesData = {
     monthlyProgress: 90,
-    dueAmount: 6,
-    collectedAmount: 6,
-    totalOffers: 6,
+    dueAmount: 2,
+    collectedAmount: 4,
+    totalOffers: 3,
     totalSales: 6,
   };
 
@@ -92,18 +94,21 @@ export default function ReportsScreen() {
       name: 'كرواسان',
       image: require('@/assets/images/cake.png'),
       price: 150,
+      sold: 45,
     },
     {
       id: '2',
       name: 'كيك مريل',
       image: require('@/assets/images/cake.png'),
       price: 120,
+      sold: 32,
     },
     {
       id: '3',
       name: 'دونات',
       image: require('@/assets/images/cake.png'),
       price: 80,
+      sold: 67,
     },
   ];
 
@@ -195,45 +200,105 @@ export default function ReportsScreen() {
                 {/* Row 1 */}
                 <View style={styles.statsRow}>
                   <View style={styles.statCard}>
-                    <Text style={styles.statValue}>
-                      {salesData.collectedAmount}
-                    </Text>
-                    <Text style={styles.statLabel}>المبيعات المحصلة</Text>
-                  </View>
-                  <View style={styles.statCard}>
                     <Text style={styles.statValue}>{salesData.dueAmount}</Text>
                     <Text style={styles.statLabel}>المبيعات المستحقة</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statValue}>
+                        {salesData.collectedAmount}
+                    </Text>
+                    <Text style={styles.statLabel}>المبيعات المحصلة</Text>
                   </View>
                 </View>
 
                 {/* Row 2 */}
                 <View style={styles.statsRow}>
-                  <View style={styles.statCard}>
-                    <Text style={styles.statValue}>{salesData.totalSales}</Text>
-                    <Text style={styles.statLabel}>المبيعات</Text>
-                  </View>
-                  <View style={styles.statCard}>
+                <View style={styles.statCard}>
                     <Text style={styles.statValue}>
                       {salesData.totalOffers}
                     </Text>
                     <Text style={styles.statLabel}>مجموع العروض</Text>
+                  </View>
+                  <View style={styles.statCard}>
+                    <Text style={styles.statValue}>{salesData.totalSales}</Text>
+                    <Text style={styles.statLabel}>المبيعات</Text>
                   </View>
                 </View>
               </View>
             </>
           ) : (
             <>
-              {/* Products List */}
-              <View style={styles.productsList}>
-                {products.map((product) => (
-                  <ProductCard
+              {/* Products Table */}
+              <View style={styles.productsTable}>
+                {/* Table Header */}
+                <View style={styles.tableHeader}>
+                  <Text
+                    style={[
+                      styles.tableHeaderText,
+                      styles.productCol,
+                      styles.tableHeaderLeft,
+                    ]}
+                  >
+                    المنتج
+                  </Text>
+                  <Text style={[styles.tableHeaderText, styles.priceCol]}>
+                    السعر
+                  </Text>
+                  <Text style={[styles.tableHeaderText, styles.soldCol]}>
+                    المباع
+                  </Text>
+                  <Text style={[styles.tableHeaderText, styles.reportCol]}>
+                    التقرير
+                  </Text>
+                </View>
+
+                {/* Table Rows */}
+                {products.map((product, index) => (
+                  <View
                     key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    image={product.image}
-                    price={product.price}
-                    onPress={() => handleProductPress(product.id)}
-                  />
+                    style={[
+                      styles.tableRow,
+                      index === products.length - 1 && styles.tableRowLast,
+                    ]}
+                  >
+                    {/* Product */}
+                    <View style={[styles.tableCell, styles.productCol]}>
+                      <Image
+                        source={product.image}
+                        style={styles.productImage}
+                        resizeMode="cover"
+                      />
+                      <Text style={styles.productName}>{product.name}</Text>
+                    </View>
+
+                    {/* Price */}
+                    <View style={[styles.tableCell, styles.priceCol]}>
+                      <View style={styles.priceContainer}>
+                        <Text style={styles.tableCellText}>
+                          {product.price}
+                        </Text>
+                        <SaudiRiyal size={12} color={Colors.textPrimary} />
+                      </View>
+                    </View>
+
+                    {/* Sold */}
+                    <View style={[styles.tableCell, styles.soldCol]}>
+                      <Text style={styles.tableCellText}>{product.sold}</Text>
+                    </View>
+
+                    {/* Report Button */}
+                    <TouchableOpacity
+                      style={[styles.tableCell, styles.reportCol]}
+                      onPress={() => handleProductPress(product.id)}
+                    >
+                      <View style={styles.reportButton}>
+                        <Diagram
+                          size={16}
+                          color={'green'}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             </>
@@ -412,6 +477,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.lg,
+    // borderColor: Colors.border,
+    // borderWidth: 1,
+    // borderRadius: BorderRadius.md,
   },
   statValue: {
     fontSize: Typography.sizes['3xl'],
@@ -424,8 +492,95 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-  productsList: {
+  productsTable: {
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  tableHeaderText: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.bold,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+  },
+  tableHeaderLeft: {
+    textAlign: 'left',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    alignItems: 'center',
+  },
+  tableRowLast: {
+    borderBottomWidth: 0,
+  },
+  tableCell: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  productCol: {
+    flex: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing.sm,
+    justifyContent: 'flex-start',
+  },
+  priceCol: {
+    flex: 1.5,
+  },
+  soldCol: {
+    flex: 1,
+  },
+  reportCol: {
+    flex: 1,
+  },
+  productImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+  },
+  productName: {
+    fontSize: Typography.sizes.sm,
+    fontWeight: Typography.weights.semibold,
+    color: Colors.textPrimary,
+    textAlign: 'left',
+  },
+  tableCellText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    fontWeight: Typography.weights.medium,
+  },
+  priceContainer: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 4,
+    justifyContent: 'center',
+  },
+  reportButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iosDatePickerBackdrop: {
     position: 'absolute',
