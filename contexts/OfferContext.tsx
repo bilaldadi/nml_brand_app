@@ -1,9 +1,11 @@
 /**
  * Offer Context
- * Manages offer state across screens
+ * Manages offer state across screens with API integration
  */
 
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import { offersService } from '@/services/api';
+import { OfferFilters, SellingOffer } from '@/types/api.types';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface Product {
   id: string;
@@ -14,7 +16,7 @@ interface Product {
   commission?: number;
 }
 
-export type OfferStatus = 'accepted' | 'processing' | 'no_offers';
+export type OfferStatus = 'pending' | 'accepted' | 'rejected';
 
 export interface SubmittedOffer {
   id: string;
@@ -39,88 +41,70 @@ interface OfferContextType {
   submittedOffers: SubmittedOffer[];
   addSubmittedOffer: (offer: Omit<SubmittedOffer, 'id' | 'createdAt'>) => void;
   updateOfferStatus: (offerId: string, status: OfferStatus) => void;
+  fetchOffers: (filters?: OfferFilters) => Promise<void>;
+  isLoadingOffers: boolean;
+  offersError: string | null;
 }
 
 const OfferContext = createContext<OfferContextType | undefined>(undefined);
 
-// Mock initial offers for testing
-const mockInitialOffers: SubmittedOffer[] = [
-  {
-    id: '1',
-    outletName: 'بنده',
-    outletLocation: 'حي الروضة، شارع الأمير',
-    outletNeighborhood: 'الروضة',
-    products: [
-      { id: '1', name: 'كيك المربل', emoji: '🍰', price: 25.50, quantity: 10, commission: 2 },
-      { id: '2', name: 'تشيز كيك', emoji: '🎂', price: 30.00, quantity: 5, commission: 2.5 },
-    ],
-    status: 'accepted',
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    totalPrice: 405.00,
-    totalQuantity: 15,
-  },
-  {
-    id: '2',
-    outletName: 'العثيم',
-    outletLocation: 'حي النزهة، شارع التحلية',
-    outletNeighborhood: 'النزهة',
-    products: [
-      { id: '3', name: 'دونات', emoji: '🍩', price: 15.00, quantity: 20, commission: 1.5 },
-      { id: '4', name: 'كرواسون', emoji: '🥐', price: 12.00, quantity: 15, commission: 2 },
-    ],
-    status: 'processing',
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    totalPrice: 480.00,
-    totalQuantity: 35,
-  },
-  {
-    id: '3',
-    outletName: 'الدانوب',
-    outletLocation: 'حي الصفا، شارع الكورنيش',
-    outletNeighborhood: 'الصفا',
-    products: [
-      { id: '5', name: 'بسكويت الشوكولاتة', emoji: '🍪', price: 18.50, quantity: 30, commission: 2 },
-    ],
-    status: 'processing',
-    createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-    totalPrice: 555.00,
-    totalQuantity: 30,
-  },
-  {
-    id: '4',
-    outletName: 'بازار',
-    outletLocation: 'حي الزهراء، شارع الملك فهد',
-    outletNeighborhood: 'الزهراء',
-    products: [
-      { id: '6', name: 'كيك الفانيليا', emoji: '🧁', price: 22.00, quantity: 12, commission: 1.8 },
-      { id: '7', name: 'كيك المربل', emoji: '🍰', price: 25.50, quantity: 8, commission: 2 },
-    ],
-    status: 'no_offers',
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-    totalPrice: 456.00,
-    totalQuantity: 20,
-  },
-  {
-    id: '5',
-    outletName: 'كارفور',
-    outletLocation: 'حي الحمراء، شارع الأمير سلطان',
-    outletNeighborhood: 'الحمراء',
-    products: [
-      { id: '8', name: 'تشيز كيك', emoji: '🎂', price: 30.00, quantity: 10, commission: 2.5 },
-      { id: '9', name: 'دونات', emoji: '🍩', price: 15.00, quantity: 25, commission: 1.5 },
-      { id: '10', name: 'كرواسون', emoji: '🥐', price: 12.00, quantity: 20, commission: 2 },
-    ],
-    status: 'accepted',
-    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-    totalPrice: 900.00,
-    totalQuantity: 55,
-  },
-];
+/**
+ * Convert API SellingOffer to local SubmittedOffer format
+ */
+function convertApiOfferToSubmittedOffer(apiOffer: SellingOffer): SubmittedOffer {
+  return {
+    id: apiOffer.id.toString(),
+    outletName: apiOffer.outlet_branch.address_line1 || 'Unknown Outlet',
+    outletLocation: `${apiOffer.outlet_branch.city.name}, ${apiOffer.outlet_branch.district.name}`,
+    outletNeighborhood: apiOffer.outlet_branch.district.name,
+    products: apiOffer.products?.map((p) => ({
+      id: p.id.toString(),
+      name: p.product.name,
+      emoji: '🍰', // Default emoji, can be mapped based on product category
+      price: p.unit_price,
+      quantity: p.quantity,
+      commission: 0, // Not provided by API
+    })) || [],
+    status: apiOffer.status as OfferStatus,
+    createdAt: new Date(apiOffer.created_at),
+    totalPrice: apiOffer.total_amount,
+    totalQuantity: apiOffer.products?.reduce((sum, p) => sum + p.quantity, 0) || 0,
+  };
+}
 
 export const OfferProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [outletId, setOutletId] = useState<string | null>(null);
-  const [submittedOffers, setSubmittedOffers] = useState<SubmittedOffer[]>(mockInitialOffers);
+  const [submittedOffers, setSubmittedOffers] = useState<SubmittedOffer[]>([]);
+  const [isLoadingOffers, setIsLoadingOffers] = useState(false);
+  const [offersError, setOffersError] = useState<string | null>(null);
+
+  // Fetch offers from API
+  const fetchOffers = useCallback(async (filters?: OfferFilters) => {
+    setIsLoadingOffers(true);
+    setOffersError(null);
+
+    try {
+      const response = await offersService.getSellingOffers(filters);
+      
+      if (response.success && response.data) {
+        const convertedOffers = response.data.map(convertApiOfferToSubmittedOffer);
+        setSubmittedOffers(convertedOffers);
+      } else {
+        setOffersError(response.message || 'Failed to fetch offers');
+      }
+    } catch (error: any) {
+      setOffersError(error.message || 'An error occurred while fetching offers');
+      setSubmittedOffers([]);
+    } finally {
+      setIsLoadingOffers(false);
+    }
+  }, []);
+
+  // Load offers on mount
+  useEffect(() => {
+    fetchOffers();
+  }, [fetchOffers]);
 
   // Memoize functions to prevent recreation on every render
   const addProduct = useCallback((product: Omit<Product, 'id'>) => {
@@ -178,8 +162,24 @@ export const OfferProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       submittedOffers,
       addSubmittedOffer,
       updateOfferStatus,
+      fetchOffers,
+      isLoadingOffers,
+      offersError,
     }),
-    [products, addProduct, updateProduct, removeProduct, clearProducts, outletId, submittedOffers, addSubmittedOffer, updateOfferStatus]
+    [
+      products,
+      addProduct,
+      updateProduct,
+      removeProduct,
+      clearProducts,
+      outletId,
+      submittedOffers,
+      addSubmittedOffer,
+      updateOfferStatus,
+      fetchOffers,
+      isLoadingOffers,
+      offersError,
+    ]
   );
 
   return (
@@ -196,4 +196,3 @@ export const useOffer = () => {
   }
   return context;
 };
-

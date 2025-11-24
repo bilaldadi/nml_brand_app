@@ -5,10 +5,14 @@
 
 import { BodyText, Button, Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
+import { authService } from '@/services/api';
+import { ApiError } from '@/types/api.types';
+import { tokenManager } from '@/utils/tokenManager';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { I18nManager, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, I18nManager, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+
 const OTP_LENGTH = 4;
 const RESEND_TIMER_SECONDS = 60;
 
@@ -20,6 +24,7 @@ export default function OTPScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(RESEND_TIMER_SECONDS);
   const [canResend, setCanResend] = useState(false);
+  const [error, setError] = useState('');
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const isRTL = I18nManager.isRTL;
@@ -45,6 +50,7 @@ export default function OTPScreen() {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    setError('');
 
     if (value && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
@@ -71,10 +77,34 @@ export default function OTPScreen() {
     if (otpCode.length !== OTP_LENGTH) return;
 
     setIsLoading(true);
-    setTimeout(() => {
+    setError('');
+
+    try {
+      // Extract phone number from display format (+966 XXX XXX XXX)
+      const cleanPhone = (phoneNumber as string).replace(/\D/g, '');
+      
+      // Verify OTP with API
+      const response = await authService.verifyOTP(cleanPhone, otpCode, 'supplier_agent');
+      
+      if (response.success && response.access_token) {
+        // Store token in memory
+        tokenManager.setToken(response.access_token);
+        
+        // Navigate to home screen
+        router.replace('/(tabs)/home');
+      } else {
+        setError(response.message || t('auth.invalidOTP'));
+        setOtp(Array(OTP_LENGTH).fill(''));
+        inputRefs.current[0]?.focus();
+      }
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || t('auth.invalidOTP'));
+      setOtp(Array(OTP_LENGTH).fill(''));
+      inputRefs.current[0]?.focus();
+    } finally {
       setIsLoading(false);
-      router.replace('/(tabs)/home');
-    }, 1500);
+    }
   };
 
   const handleVerify = async () => {
@@ -85,13 +115,31 @@ export default function OTPScreen() {
   const handleResend = async () => {
     if (!canResend) return;
     setIsLoading(true);
-    setTimeout(() => {
+    setError('');
+
+    try {
+      // Extract phone number from display format
+      const cleanPhone = (phoneNumber as string).replace(/\D/g, '');
+      
+      // Request new OTP
+      const response = await authService.requestOTP(cleanPhone, 'supplier_agent');
+      
+      if (response.success) {
+        setTimer(RESEND_TIMER_SECONDS);
+        setCanResend(false);
+        setOtp(Array(OTP_LENGTH).fill(''));
+        inputRefs.current[0]?.focus();
+        
+        Alert.alert(t('auth.success'), t('auth.otpResent'));
+      } else {
+        setError(response.message || t('auth.errorGeneric'));
+      }
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || t('auth.errorGeneric'));
+    } finally {
       setIsLoading(false);
-      setTimer(RESEND_TIMER_SECONDS);
-      setCanResend(false);
-      setOtp(Array(OTP_LENGTH).fill(''));
-      inputRefs.current[0]?.focus();
-    }, 1000);
+    }
   };
 
   const isOtpComplete = otp.every((digit) => digit !== '');
@@ -137,6 +185,14 @@ export default function OTPScreen() {
             />
           ))}
         </View>
+
+        {error ? (
+          <View style={styles.errorContainer}>
+            <BodyText color={Colors.error} align="center" style={styles.errorText}>
+              {error}
+            </BodyText>
+          </View>
+        ) : null}
 
         <View style={styles.resendContainer}>
           {canResend ? (
@@ -221,6 +277,12 @@ const styles = StyleSheet.create({
   },
   otpInputFilled: {
     borderColor: Colors.primary,
+  },
+  errorContainer: {
+    marginBottom: Spacing.md,
+  },
+  errorText: {
+    fontSize: Typography.sizes.sm,
   },
   resendContainer: {
     alignItems: 'center',

@@ -5,12 +5,13 @@
 
 import { BodyText, Caption, Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Product } from '@/types';
+import { Product as APIProduct } from '@/types/api.types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft2, ArrowRight2, Box, Heart, Tag } from 'iconsax-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
   I18nManager,
   Image,
   Platform,
@@ -20,66 +21,11 @@ import {
   View
 } from 'react-native';
 
+import { productsService } from '@/services/api';
+import { BASE_URL } from '@/services/api/client';
 import { SaudiRiyal } from 'lucide-react-native';
 // @ts-ignore - Image import
 import productsImage from '@/assets/images/cake.png';
-// Mock products data (same as products page)
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'كيك المربل',
-    description: 'كيك شهي بمذاق المربل اللذيذ، محضر بعناية من أجود المكونات الطبيعية. مثالي للاحتفالات والمناسبات الخاصة.',
-    price: 25.50,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 150,
-  },
-  {
-    id: '2',
-    name: 'تشيز كيك',
-    description: 'تشيز كيك كريمي بطبقات الفواكه الطازجة، نكهة فريدة ومميزة تجمع بين الحلاوة والكريمية.',
-    price: 30.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 80,
-  },
-  {
-    id: '3',
-    name: 'دونات',
-    description: 'دونات طازجة محلاة بالشوكولاتة الغنية، مقرمشة من الخارج وطرية من الداخل.',
-    price: 15.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 200,
-  },
-  {
-    id: '4',
-    name: 'كرواسون',
-    description: 'كرواسون فرنسي مقرمش، محضر بالطريقة التقليدية الفرنسية الأصلية.',
-    price: 12.00,
-    image: productsImage,
-    category: 'مخبوزات',
-    stock: 120,
-  },
-  {
-    id: '5',
-    name: 'بسكويت الشوكولاتة',
-    description: 'بسكويت بالشوكولاتة الغنية، يحتفظ بنكهته الطازجة لفترة طويلة.',
-    price: 18.50,
-    image: productsImage,
-    category: 'مخبوزات',
-    stock: 300,
-  },
-  {
-    id: '6',
-    name: 'كيك الفانيليا',
-    description: 'كيك فانيليا ناعم ومقرمش، مع نكهة الفانيليا الطبيعية الأصيلة.',
-    price: 22.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 90,
-  },
-];
 
 export default function ProductDetailsScreen() {
   const router = useRouter();
@@ -87,12 +33,59 @@ export default function ProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const isRTL = I18nManager.isRTL;
   const [isFavorited, setIsFavorited] = useState(false);
-  // const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<APIProduct | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Find product by id
-  const product = mockProducts.find(p => p.id === id);
+  // Fetch product details from API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      setError(null);
 
-  if (!product) {
+      try {
+        const response = await productsService.getProductById(Number(id));
+        
+        if (response.success && response.data) {
+          setProduct(response.data);
+        } else {
+          setError(response.message || 'Failed to fetch product');
+        }
+      } catch (err: any) {
+        setError(err.message || 'An error occurred while fetching product');
+        setProduct(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <ArrowRight2 size={24} color={Colors.white} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <BodyText style={styles.loadingText}>جاري تحميل تفاصيل المنتج...</BodyText>
+        </View>
+      </View>
+    );
+  }
+
+  // Error or product not found
+  if (error || !product) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -102,10 +95,10 @@ export default function ProductDetailsScreen() {
           >
             <ArrowLeft2 size={24} color={Colors.white} />
           </TouchableOpacity>
-          <Heading2 style={styles.headerTitle}>المنتج غير موجود</Heading2>
+          <Heading2 style={styles.headerTitle}>خطأ</Heading2>
         </View>
         <View style={styles.errorContainer}>
-          <BodyText style={styles.errorText}>المنتج المطلوب غير موجود</BodyText>
+          <BodyText style={styles.errorText}>{error || 'المنتج المطلوب غير موجود'}</BodyText>
           <TouchableOpacity
             style={styles.backToProductsButton}
             onPress={() => router.push('/(tabs)/products')}
@@ -156,34 +149,44 @@ export default function ProductDetailsScreen() {
       >
         {/* Product Image */}
         <View style={styles.imageContainer}>
-          {typeof product.image === 'string' ? (
-            <BodyText>{product.image}</BodyText>
+          {product.image_url ? (
+            <Image 
+              source={{ uri: `${BASE_URL}/${product.image_url}` }} 
+              style={styles.productImage} 
+              resizeMode="contain"
+              defaultSource={productsImage}
+            />
           ) : (
-            <Image source={product.image} style={styles.productImage} resizeMode="contain" />
+            <Image source={productsImage} style={styles.productImage} resizeMode="contain" />
           )}
         </View>
 
         {/* Product Info */}
         <View style={styles.infoContainer}>
           <View style={styles.categoryBadge}>
-            <Caption style={styles.categoryText}>{product.category}</Caption>
+            <Caption style={styles.categoryText}>{product.sub_category.name}</Caption>
           </View>
 
           <Heading2 style={styles.productName}>{product.name}</Heading2>
 
-         
-
-          {/* Description */}
+          {/* SKU */}
           <View style={styles.section}>
-            <BodyText style={styles.description}>{product.description}</BodyText>
+            <Caption style={styles.skuText}>SKU: {product.sku}</Caption>
           </View>
 
-          {/* Stock Card */}
+          {/* Description */}
+          {product.description && (
+            <View style={styles.section}>
+              <BodyText style={styles.description}>{product.description}</BodyText>
+            </View>
+          )}
+
+          {/* Brand Card */}
           <View style={styles.infoCard}>
             <View style={styles.cardContent}>
-              <Caption style={styles.cardLabel}>المخزون</Caption>
+              <Caption style={styles.cardLabel}>العلامة التجارية</Caption>
               <BodyText style={styles.cardValue}>
-                {product.stock} حبة
+                {product.brand.name}
               </BodyText>
             </View>
             <View style={styles.iconContainer}>
@@ -191,19 +194,45 @@ export default function ProductDetailsScreen() {
             </View>
           </View>
 
-          {/* Price Card */}
+          {/* Cost Price Card */}
           <View style={styles.infoCard}>
             <View style={styles.cardContent}>
-              <Caption style={styles.cardLabel}>السعر</Caption>
+              <Caption style={styles.cardLabel}>سعر التكلفة</Caption>
               <View style={styles.priceRow}>
                 <BodyText style={styles.cardValue}>
-                  {product.price.toFixed(2)}
+                  {product.cost_price.toFixed(2)}
+                </BodyText>
+                <SaudiRiyal size={15} />
+              </View>
+            </View>
+            <View style={styles.iconContainer}>
+              <Tag size={24} color={Colors.textSecondary} variant="Outline" />
+            </View>
+          </View>
+
+          {/* Selling Price Card */}
+          <View style={styles.infoCard}>
+            <View style={styles.cardContent}>
+              <Caption style={styles.cardLabel}>سعر البيع</Caption>
+              <View style={styles.priceRow}>
+                <BodyText style={styles.cardValue}>
+                  {product.selling_price.toFixed(2)}
                 </BodyText>
                 <SaudiRiyal size={15} />
               </View>
             </View>
             <View style={styles.iconContainer}>
               <Tag size={24} color={Colors.primary} variant="Outline" />
+            </View>
+          </View>
+
+          {/* Status */}
+          <View style={[styles.infoCard, !product.is_active && styles.inactiveCard]}>
+            <View style={styles.cardContent}>
+              <Caption style={styles.cardLabel}>الحالة</Caption>
+              <BodyText style={[styles.cardValue, !product.is_active && styles.inactiveText]}>
+                {product.is_active ? 'نشط' : 'غير نشط'}
+              </BodyText>
             </View>
           </View>
 
@@ -455,6 +484,29 @@ const styles = StyleSheet.create({
   backToProductsText: {
     color: Colors.white,
     fontWeight: Typography.weights.semibold,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Spacing['3xl'],
+  },
+  loadingText: {
+    marginTop: Spacing.md,
+    color: Colors.textSecondary,
+    fontSize: Typography.sizes.base,
+  },
+  skuText: {
+    color: Colors.textSecondary,
+    fontSize: Typography.sizes.sm,
+    textAlign: 'left',
+  },
+  inactiveCard: {
+    borderColor: Colors.error,
+    backgroundColor: '#FEE',
+  },
+  inactiveText: {
+    color: Colors.error,
   },
   bottomBar: {
     backgroundColor: Colors.white,

@@ -5,6 +5,8 @@
 
 import { BodyText, Button, Caption, Heading2 } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
+import { authService } from '@/services/api';
+import { ApiError } from '@/types/api.types';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,17 +41,31 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    setError('');
+
+    try {
+      // Request OTP from API
+      const response = await authService.requestOTP(phoneNumber, 'supplier_agent');
+      
+      if (response.success) {
+        // Format with +966 prefix for display
+        const formattedPhone = phoneNumber.startsWith('0') 
+          ? `+966${phoneNumber.slice(1)}` 
+          : `+966${phoneNumber}`;
+        
+        router.push({
+          pathname: '/auth/otp',
+          params: { phoneNumber: formattedPhone },
+        });
+      } else {
+        setError(response.message || t('auth.errorGeneric'));
+      }
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || t('auth.errorGeneric'));
+    } finally {
       setIsLoading(false);
-      // Format with +966 prefix for display
-      const formattedPhone = phoneNumber.startsWith('0') 
-        ? `+966${phoneNumber.slice(1)}` 
-        : `+966${phoneNumber}`;
-      router.push({
-        pathname: '/auth/otp',
-        params: { phoneNumber: formattedPhone },
-      });
-    }, 1500);
+    }
   };
 
   const handleBackPress = () => {

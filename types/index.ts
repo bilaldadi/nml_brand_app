@@ -2,6 +2,9 @@
  * TypeScript type definitions for the app
  */
 
+// Export all API types
+export * from './api.types';
+
 export interface User {
   id: string;
   name: string;

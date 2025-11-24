@@ -8,10 +8,11 @@ import { BodyText, Caption } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
 import { useOffer } from '@/contexts/OfferContext';
 import { useRouter } from 'expo-router';
-import { Box, Location, TickCircle, Truck } from 'iconsax-react-native';
-import React, { useState } from 'react';
+import { Box, Clock, Location, TickCircle, Truck } from 'iconsax-react-native';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -23,25 +24,30 @@ import {
 export default function OffersScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { submittedOffers } = useOffer();
-  const [activeFilter, setActiveFilter] = useState<'all' | 'accepted' | 'processing'>('all');
+  const { submittedOffers, fetchOffers, isLoadingOffers, offersError } = useOffer();
+  const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Map filter type to offer status - only accepted and processing
+  // Fetch offers on mount
+  useEffect(() => {
+    fetchOffers();
+  }, [fetchOffers]);
+
+  // Map filter type to offer status - include all statuses
   const filters: FilterOption[] = [
     { type: 'all', label: t('home.filters.all'), color: Colors.primary, showIcon: false },
+    { type: 'pending', label: 'قيد الانتظار', color: '#FF9800' },
     { type: 'accepted', label: t('home.filters.accepted'), color: '#4CAF50' },
-    { type: 'processing', label: t('home.filters.processing'), color: '#FF9800' },
+    { type: 'rejected', label: 'مرفوض', color: '#F44336' },
   ];
 
-  // Filter offers by status - only show accepted and processing
+  // Filter offers by status - show all statuses
   const filteredOffers = submittedOffers.filter(offer => {
-    const matchesStatus = offer.status === 'accepted' || offer.status === 'processing';
     const matchesFilter = activeFilter === 'all' || offer.status === activeFilter;
     const matchesSearch = searchQuery === '' || 
       offer.outletName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       offer.outletLocation.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesFilter && matchesSearch;
+    return matchesFilter && matchesSearch;
   });
 
   const handleProfilePress = () => {
@@ -131,10 +137,26 @@ export default function OffersScreen() {
           </View>
         )}
 
-        {/* Processing - Waiting Status */}
-        {item.status === 'processing' && (
+        {/* Pending - Waiting Status */}
+        {item.status === 'pending' && (
           <View style={styles.waitingBanner}>
+            <Clock size={20} color={Colors.primary} variant="Bold" />
             <Text style={styles.waitingText}>بانتظار قبول الطلب</Text>
+          </View>
+        )}
+
+        {/* Processing - In Progress */}
+        {item.status === 'processing' && (
+          <View style={[styles.waitingBanner, styles.processingBanner]}>
+            <Truck size={20} color="#FF9800" variant="Bold" />
+            <Text style={[styles.waitingText, styles.processingText]}>جاري التجهيز</Text>
+          </View>
+        )}
+
+        {/* Rejected Status */}
+        {item.status === 'rejected' && (
+          <View style={[styles.waitingBanner, styles.rejectedBanner]}>
+            <Text style={[styles.waitingText, styles.rejectedText]}>مرفوض</Text>
           </View>
         )}
       </TouchableOpacity>
@@ -161,7 +183,7 @@ export default function OffersScreen() {
           filters={filters}
           activeFilter={activeFilter}
           onFilterPress={(filterType) => {
-            if (filterType === 'all' || filterType === 'accepted' || filterType === 'processing') {
+            if (filterType === 'all' || filterType === 'pending' || filterType === 'accepted' || filterType === 'rejected') {
               setActiveFilter(filterType);
             }
           }}
@@ -169,8 +191,25 @@ export default function OffersScreen() {
         />
       </View>
 
-      {/* Offers List */}
-      {filteredOffers.length === 0 ? (
+      {/* Loading State */}
+      {isLoadingOffers ? (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <BodyText style={styles.loadingText}>جاري تحميل العروض...</BodyText>
+        </View>
+      ) : offersError ? (
+        /* Error State */
+        <View style={styles.emptyContainer}>
+          <BodyText style={styles.errorText}>{offersError}</BodyText>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => fetchOffers()}
+          >
+            <BodyText style={styles.retryButtonText}>إعادة المحاولة</BodyText>
+          </TouchableOpacity>
+        </View>
+      ) : filteredOffers.length === 0 ? (
+        /* Empty State */
         <View style={styles.emptyContainer}>
           <BodyText style={styles.emptyText}>لا توجد عروض مرسلة</BodyText>
           <Caption style={styles.emptySubtext}>
@@ -178,6 +217,7 @@ export default function OffersScreen() {
           </Caption>
         </View>
       ) : (
+        /* Offers List */
         <FlatList
           data={filteredOffers}
           renderItem={renderOfferCard}
@@ -306,12 +346,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.md,
     margin: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+  },
+  processingBanner: {
+    backgroundColor: '#FFF3E0',
+  },
+  rejectedBanner: {
+    backgroundColor: '#FFEBEE',
   },
   waitingText: {
     fontSize: Typography.sizes.base,
     color: Colors.primary,
     fontWeight: Typography.weights.semibold,
     textAlign: 'center',
+  },
+  processingText: {
+    color: '#FF9800',
+  },
+  rejectedText: {
+    color: '#F44336',
+  },
+  loadingText: {
+    marginTop: Spacing.md,
+    color: Colors.textSecondary,
+    fontSize: Typography.sizes.base,
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: Typography.sizes.base,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+  retryButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+  },
+  retryButtonText: {
+    color: Colors.white,
+    fontWeight: Typography.weights.semibold,
   },
   emptyContainer: {
     flex: 1,

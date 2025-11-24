@@ -5,12 +5,13 @@
 
 import { BodyText, Caption } from '@/components/ui';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants';
-import { Product } from '@/types';
+import { Product as APIProduct } from '@/types/api.types';
 import { useRouter } from 'expo-router';
 import { SaudiRiyal } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
   FlatList,
   I18nManager,
   Image,
@@ -22,65 +23,10 @@ import {
 
 import { Header } from '@/app/home/components/Header';
 import { SearchBar } from '@/app/home/components/SearchBar';
+import { productsService } from '@/services/api';
+import { BASE_URL } from '@/services/api/client';
 // @ts-ignore - Image import
 import productsImage from '../../assets/images/cake.png';
-// Mock products data
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'كيك المربل',
-    description: 'كيك شهي بمذاق المربل اللذيذ',
-    price: 25.50,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 150,
-  },
-  {
-    id: '2',
-    name: 'تشيز كيك',
-    description: 'تشيز كيك كريمي بطبقات الفواكه',
-    price: 30.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 80,
-  },
-  {
-    id: '3',
-    name: 'دونات',
-    description: 'دونات طازجة محلاة بالشوكولاتة',
-    price: 15.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 200,
-  },
-  {
-    id: '4',
-    name: 'كرواسون',
-    description: 'كرواسون فرنسي مقرمش',
-    price: 12.00,
-    image: productsImage,
-    category: 'مخبوزات',
-    stock: 120,
-  },
-  {
-    id: '5',
-    name: 'بسكويت الشوكولاتة',
-    description: 'بسكويت بالشوكولاتة الغنية',
-    price: 18.50,
-    image: productsImage,
-    category: 'مخبوزات',
-    stock: 300,
-  },
-  {
-    id: '6',
-    name: 'كيك الفانيليا',
-    description: 'كيك فانيليا ناعم ومقرمش',
-    price: 22.00,
-    image: productsImage,
-    category: 'حلويات',
-    stock: 90,
-  },
-];
 
 export default function ProductsScreen() {
   const router = useRouter();
@@ -88,6 +34,9 @@ export default function ProductsScreen() {
   const isRTL = I18nManager.isRTL;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [products, setProducts] = useState<APIProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleProfilePress = () => {
     router.push({
@@ -96,55 +45,99 @@ export default function ProductsScreen() {
     });
   };
 
-  // Get unique categories
-  const categories = Array.from(new Set(mockProducts.map(p => p.category)));
+  // Fetch products from API
+  const fetchProducts = useCallback(async (search?: string) => {
+    setIsLoading(true);
+    setError(null);
+    //TODO: Add pagination !important
+    try {
+      const response = await productsService.getProducts({
+        search: search || undefined,
+        is_active: 1,
+        per_page: 1000, // Fetch all products //TODO: Remove this !important
+      });
 
-  // Filter products
-  const filteredProducts = mockProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+      if (response.success && response.data) {
+        setProducts(response.data);
+      } else {
+        setError(response.message || 'Failed to fetch products');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching products');
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const handleProductPress = (productId: string) => {
+  // Load products on mount
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Handle search with debounce
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts(searchQuery);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, fetchProducts]);
+
+  // Get unique categories from products
+  const categories = Array.from(new Set(products.map(p => p.sub_category.name)));
+
+  // Filter products by category (client-side)
+  const filteredProducts = selectedCategory
+    ? products.filter(product => product.sub_category.name === selectedCategory)
+    : products;
+
+  const handleProductPress = (productId: number) => {
     router.push(`/products/${productId}`);
   };
 
-  const renderProductCard = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      style={styles.productCard}
-      onPress={() => handleProductPress(item.id)}
-      activeOpacity={0.7}
-    >
-      <Caption style={styles.stockText}>
-        المخزون: {item.stock} حبة
-      </Caption>
-      <View style={styles.productImageContainer}>
-        {typeof item.image === 'string' ? (
-          <BodyText style={styles.productEmoji}>{item.image}</BodyText>
-        ) : (
-          <Image source={item.image} style={styles.productImage} resizeMode="contain" />
-        )}
-      </View>
-      <View style={styles.productInfo}>
-        <BodyText style={styles.productName} numberOfLines={1}>
-          {item.name}
-        </BodyText>
-        {/* <Caption style={styles.productDescription} numberOfLines={2}>
-          {item.description}
-        </Caption> */}
-        <View style={styles.productPriceContainer}>
-          <View style={styles.priceRow}>
-            <BodyText style={styles.productPrice}>
-              {item.price.toFixed(2)}
-            </BodyText>
-            <SaudiRiyal size={14} color={Colors.primary} />
+  const renderProductCard = ({ item }: { item: APIProduct }) => {
+    const imageUrl = item.image_url 
+      ? `${BASE_URL}/${item.image_url}`
+      : null;
+
+    return (
+      <TouchableOpacity
+        style={styles.productCard}
+        onPress={() => handleProductPress(item.id)}
+        activeOpacity={0.7}
+      >
+        <Caption style={styles.stockText}>
+          {item.brand.name}
+        </Caption>
+        <View style={styles.productImageContainer}>
+          {imageUrl ? (
+            <Image 
+              source={{ uri: imageUrl }} 
+              style={styles.productImage} 
+              resizeMode="contain"
+              defaultSource={productsImage}
+            />
+          ) : (
+            <Image source={productsImage} style={styles.productImage} resizeMode="contain" />
+          )}
+        </View>
+        <View style={styles.productInfo}>
+          <BodyText style={styles.productName} numberOfLines={1}>
+            {item.name}
+          </BodyText>
+          <View style={styles.productPriceContainer}>
+            <View style={styles.priceRow}>
+              <BodyText style={styles.productPrice}>
+                {item.selling_price.toFixed(2)}
+              </BodyText>
+              <SaudiRiyal size={14} color={Colors.primary} />
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -207,20 +200,37 @@ export default function ProductsScreen() {
       </View>
 
       {/* Products Grid */}
-      <FlatList
-        data={filteredProducts}
-        renderItem={renderProductCard}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.productsList}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <BodyText style={styles.emptyText}>لا توجد منتجات</BodyText>
-          </View>
-        }
-      />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <BodyText style={styles.loadingText}>جاري تحميل المنتجات...</BodyText>
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <BodyText style={styles.errorText}>{error}</BodyText>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => fetchProducts()}
+          >
+            <BodyText style={styles.retryButtonText}>إعادة المحاولة</BodyText>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          renderItem={renderProductCard}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.productsList}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <BodyText style={styles.emptyText}>لا توجد منتجات</BodyText>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -346,5 +356,39 @@ const styles = StyleSheet.create({
   emptyText: {
     color: Colors.textSecondary,
     fontSize: Typography.sizes.base,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Spacing['3xl'],
+  },
+  loadingText: {
+    marginTop: Spacing.md,
+    color: Colors.textSecondary,
+    fontSize: Typography.sizes.base,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: Spacing['3xl'],
+    paddingHorizontal: Spacing.lg,
+  },
+  errorText: {
+    color: Colors.error,
+    fontSize: Typography.sizes.base,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+  retryButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+  },
+  retryButtonText: {
+    color: Colors.white,
+    fontWeight: Typography.weights.semibold,
   },
 });
